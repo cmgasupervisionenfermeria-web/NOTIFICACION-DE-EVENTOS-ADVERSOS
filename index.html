@@ -25,30 +25,25 @@
   body{
     margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--text);
   }
-  /* ---------- LOGIN ---------- */
-  #pantallaLogin{
-    min-height:100vh; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
-  }
+  /* ---------- MODAL DE PIN (acceso de gestión) ---------- */
   .loginCard{
-    background:var(--card); border-radius:12px; padding:36px 32px; width:340px;
-    box-shadow:0 12px 40px rgba(0,0,0,.25); text-align:center;
+    background:var(--card); border-radius:12px; padding:32px 28px; width:320px; max-width:100%;
+    box-shadow:0 12px 40px rgba(0,0,0,.25); text-align:center; margin:0 auto;
   }
-  .loginCard h1{ font-size:19px; color:var(--navy); margin:0 0 4px; }
-  .loginCard p{ font-size:13px; color:var(--muted); margin:0 0 20px; }
+  .loginCard h1{ font-size:17px; color:var(--navy); margin:0 0 4px; }
+  .loginCard p{ font-size:13px; color:var(--muted); margin:0 0 18px; }
   .loginCard input{
     width:100%; padding:12px; font-size:18px; text-align:center; letter-spacing:2px;
     border:2px solid var(--border); border-radius:8px; margin-bottom:14px;
   }
-  .loginCard button{
+  .loginCard button.btnEntrar{
     width:100%; padding:12px; background:var(--teal); color:#fff; border:none; border-radius:8px;
     font-size:15px; font-weight:bold; cursor:pointer;
   }
-  .loginCard button:hover{ background:var(--teal-dark); }
+  .loginCard button.btnEntrar:hover{ background:var(--teal-dark); }
   #errorLogin{ color:var(--rojo); font-size:13px; margin-top:10px; min-height:16px; }
 
   /* ---------- APP SHELL ---------- */
-  #app{ display:none; }
   header.top{
     background:var(--navy); color:#fff; padding:14px 24px;
     display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
@@ -186,14 +181,15 @@
 </head>
 <body>
 
-<!-- ================= LOGIN ================= -->
-<div id="pantallaLogin">
+<!-- ================= MODAL DE PIN (solo para gestión: Eventos / Indicadores) ================= -->
+<div class="overlay" id="overlayPin">
   <div class="loginCard">
-    <h1>Eventos Adversos</h1>
-    <p>Centro Médico Galerías Aguascalientes<br>Acceso restringido a jefes de turno y supervisores</p>
+    <h1>Acceso de jefes de turno / supervisores</h1>
+    <p>Esta sección incluye datos de pacientes y el seguimiento de cada evento. Ingresa el PIN para continuar.</p>
     <input type="password" id="inputPin" placeholder="PIN de acceso" maxlength="12" autocomplete="off">
-    <button onclick="intentarLogin()">Ingresar</button>
+    <button class="btnEntrar" onclick="confirmarPin()">Ingresar</button>
     <div id="errorLogin"></div>
+    <button class="secundario" style="margin-top:10px;width:100%;" onclick="cerrarModalPin()">Cancelar</button>
   </div>
 </div>
 
@@ -204,13 +200,13 @@
       <h1>Reporte y Registro de Eventos Adversos</h1>
       <div class="sub">CMGA · Farmacovigilancia (NOM-220-SSA1-2016) y Seguridad del Paciente</div>
     </div>
-    <button class="secundario" onclick="cerrarSesion()" style="background:transparent;color:#fff;border-color:#fff;">Cerrar sesión</button>
+    <button class="secundario" id="btnSesion" onclick="botonSesionClick()" style="background:transparent;color:#fff;border-color:#fff;">🔒 Acceso de supervisión</button>
   </header>
 
   <div class="tabs">
     <button id="tabBtn-nuevo" class="activa" onclick="mostrarVista('nuevo')">➕ Nuevo evento</button>
-    <button id="tabBtn-eventos" onclick="mostrarVista('eventos')">📋 Eventos</button>
-    <button id="tabBtn-indicadores" onclick="mostrarVista('indicadores')">📊 Indicadores</button>
+    <button id="tabBtn-eventos" onclick="mostrarVista('eventos')">📋 Eventos (supervisión)</button>
+    <button id="tabBtn-indicadores" onclick="mostrarVista('indicadores')">📊 Indicadores (supervisión)</button>
   </div>
 
   <main>
@@ -272,8 +268,8 @@
 
           <div class="grid2">
             <div class="campo">
-              <label>Registrado por (jefe de turno / supervisor) *</label>
-              <input type="text" id="f_RegistradoPor" required placeholder="Nombre completo">
+              <label>Nombre de quien reporta *</label>
+              <input type="text" id="f_RegistradoPor" required placeholder="Nombre completo (quien detecta o reporta el evento)">
             </div>
             <div class="campo">
               <label>Paciente (nombre o número de expediente)</label>
@@ -396,6 +392,7 @@
           <h2 style="margin:0;">Eventos registrados</h2>
           <button class="secundario" onclick="cargarEventos()">🔄 Actualizar</button>
         </div>
+        <div id="errorEventos" style="display:none;color:var(--rojo);font-size:13px;margin-bottom:12px;font-weight:bold;"></div>
         <div class="filtros">
           <div class="campo busca">
             <label>Buscar (folio, área, descripción)</label>
@@ -441,6 +438,7 @@
           <h2 style="margin:0;">Indicadores</h2>
           <button class="secundario" onclick="cargarIndicadores()">🔄 Actualizar</button>
         </div>
+        <div id="errorIndicadores" style="display:none;color:var(--rojo);font-size:13px;margin-bottom:12px;font-weight:bold;"></div>
         <div class="kpis" id="kpisPrincipales"></div>
         <div class="grid2">
           <div>
@@ -547,44 +545,91 @@ function calcularNaranjoCliente(prefix){
 }
 
 /* ============================================================================
-   LOGIN
+   ACCESO DE SUPERVISIÓN (PIN)
+   ----------------------------------------------------------------------------
+   El registro de un evento nuevo (pestaña "Nuevo evento") NO requiere PIN:
+   cualquier persona puede abrir esta página — por ejemplo escaneando un
+   código QR — y reportar un evento directamente. El PIN solo se pide al
+   entrar a "Eventos" o "Indicadores", porque ahí se ven datos de pacientes
+   y el seguimiento de cada caso.
    ============================================================================ */
-function intentarLogin(){
+let vistaPendientePin = null; // vista a la que se entrará si el PIN es correcto
+
+function obtenerPin(){
+  return sessionStorage.getItem('ea_pin') || '';
+}
+function estaAutenticado(){
+  return obtenerPin() === PIN_ACCESO;
+}
+
+function abrirModalPin(vistaDestino){
+  vistaPendientePin = vistaDestino;
+  document.getElementById('inputPin').value = '';
+  document.getElementById('errorLogin').textContent = '';
+  document.getElementById('overlayPin').classList.add('activa');
+  document.getElementById('inputPin').focus();
+}
+function cerrarModalPin(){
+  document.getElementById('overlayPin').classList.remove('activa');
+  vistaPendientePin = null;
+}
+function confirmarPin(){
   const pin = document.getElementById('inputPin').value.trim();
   if(pin === PIN_ACCESO){
-    sessionStorage.setItem('ea_sesion', '1');
-    mostrarApp();
+    sessionStorage.setItem('ea_pin', pin);
+    const destino = vistaPendientePin;
+    cerrarModalPin();
+    actualizarBotonSesion();
+    if(destino) activarVista(destino);
   } else {
     document.getElementById('errorLogin').textContent = 'PIN incorrecto.';
   }
 }
 document.getElementById('inputPin').addEventListener('keydown', function(e){
-  if(e.key === 'Enter') intentarLogin();
+  if(e.key === 'Enter') confirmarPin();
 });
 
 function cerrarSesion(){
-  sessionStorage.removeItem('ea_sesion');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('pantallaLogin').style.display = 'flex';
-  document.getElementById('inputPin').value = '';
+  sessionStorage.removeItem('ea_pin');
+  actualizarBotonSesion();
+  mostrarVista('nuevo');
 }
 
-function mostrarApp(){
-  document.getElementById('pantallaLogin').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  cargarEventos();
+function botonSesionClick(){
+  if(estaAutenticado()){
+    cerrarSesion();
+  } else {
+    abrirModalPin(null);
+  }
+}
+
+function actualizarBotonSesion(){
+  const btn = document.getElementById('btnSesion');
+  if(estaAutenticado()){
+    btn.textContent = 'Cerrar sesión de supervisión';
+  } else {
+    btn.textContent = '🔒 Acceso de supervisión';
+  }
 }
 
 window.addEventListener('load', function(){
-  if(sessionStorage.getItem('ea_sesion') === '1'){
-    mostrarApp();
-  }
+  actualizarBotonSesion();
 });
 
 /* ============================================================================
    NAVEGACIÓN DE PESTAÑAS
    ============================================================================ */
+const VISTAS_PROTEGIDAS = ['eventos', 'indicadores'];
+
 function mostrarVista(nombre){
+  if(VISTAS_PROTEGIDAS.includes(nombre) && !estaAutenticado()){
+    abrirModalPin(nombre);
+    return;
+  }
+  activarVista(nombre);
+}
+
+function activarVista(nombre){
   document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
   document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('activa'));
   document.getElementById('vista-' + nombre).classList.add('activa');
@@ -677,7 +722,7 @@ function guardarEvento(e){
         document.getElementById('lbl-seguridad').classList.remove('marcada');
         document.getElementById('f_FechaEvento').valueAsDate = new Date();
         calcularNaranjoCliente('f_naranjo_');
-        cargarEventos();
+        if(estaAutenticado()) cargarEventos(); // refresca el listado solo si ya se entró como supervisor
       } else {
         mostrarMensaje('error', 'Error al guardar: ' + resp.error);
       }
@@ -709,29 +754,66 @@ function llamarBackend(action, extra){
   }).then(r => r.json());
 }
 
+function mostrarError(idDiv, texto){
+  const el = document.getElementById(idDiv);
+  if(!el) return;
+  if(texto){
+    el.textContent = '⚠ ' + texto;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+}
+
 function cargarEventos(){
-  fetch(APPS_SCRIPT_URL + '?action=list&t=' + Date.now())
+  mostrarError('errorEventos', '');
+  fetch(APPS_SCRIPT_URL + '?action=list&pin=' + encodeURIComponent(obtenerPin()) + '&t=' + Date.now())
     .then(r => r.json())
     .then(resp => {
       if(resp.ok){
         eventosCache = resp.eventos;
         try{ localStorage.setItem(LS_KEY, JSON.stringify(eventosCache)); }catch(e){}
         renderTabla();
+      } else if(resp.error === 'PIN inválido'){
+        cerrarSesion();
+        abrirModalPin('eventos');
+      } else {
+        mostrarError('errorEventos', 'No se pudieron cargar los eventos: ' + (resp.error || 'error desconocido del servidor.'));
       }
     })
-    .catch(() => {
+    .catch(err => {
       // sin conexión: usar última copia local si existe
       try{
         const local = localStorage.getItem(LS_KEY);
-        if(local){ eventosCache = JSON.parse(local); renderTabla(); }
-      }catch(e){}
+        if(local){
+          eventosCache = JSON.parse(local);
+          renderTabla();
+          mostrarError('errorEventos', 'Sin conexión — mostrando la última copia guardada en este dispositivo.');
+        } else {
+          mostrarError('errorEventos', 'No se pudo conectar con el servidor: ' + err);
+        }
+      }catch(e){
+        mostrarError('errorEventos', 'No se pudo conectar con el servidor: ' + err);
+      }
     });
 }
 
 function cargarIndicadores(){
-  fetch(APPS_SCRIPT_URL + '?action=indicadores&t=' + Date.now())
+  mostrarError('errorIndicadores', '');
+  fetch(APPS_SCRIPT_URL + '?action=indicadores&pin=' + encodeURIComponent(obtenerPin()) + '&t=' + Date.now())
     .then(r => r.json())
-    .then(resp => { if(resp.ok) renderIndicadores(resp.indicadores); });
+    .then(resp => {
+      if(resp.ok){
+        renderIndicadores(resp.indicadores);
+      } else if(resp.error === 'PIN inválido'){
+        cerrarSesion();
+        abrirModalPin('indicadores');
+      } else {
+        mostrarError('errorIndicadores', 'No se pudieron cargar los indicadores: ' + (resp.error || 'error desconocido del servidor.'));
+      }
+    })
+    .catch(err => mostrarError('errorIndicadores', 'No se pudo conectar con el servidor: ' + err));
 }
 
 /* ============================================================================
@@ -973,7 +1055,7 @@ function cerrarEventoModal(){
 
 function cargarEventosYReabrir(){
   const folio = folioAbierto;
-  fetch(APPS_SCRIPT_URL + '?action=list&t=' + Date.now())
+  fetch(APPS_SCRIPT_URL + '?action=list&pin=' + encodeURIComponent(obtenerPin()) + '&t=' + Date.now())
     .then(r => r.json())
     .then(resp => {
       if(resp.ok){
