@@ -175,6 +175,11 @@
   .barra-relleno{ height:100%; background:var(--teal); }
   .barra-fila .num{ width:30px; text-align:right; font-weight:bold; }
 
+  .naranjo-fila{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .naranjo-fila .pregunta{ flex:1; }
+  .naranjo-fila select{ width:130px; flex-shrink:0; }
+  @media (max-width:600px){ .naranjo-fila{ flex-direction:column; align-items:stretch; } .naranjo-fila select{ width:100%; } }
+
   .vacio{ text-align:center; color:var(--muted); padding:30px; font-size:14px; }
   .toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
 </style>
@@ -245,6 +250,26 @@
             </div>
           </div>
 
+          <div class="grid3">
+            <div class="campo">
+              <label>Turno</label>
+              <select id="f_Turno">
+                <option value="">Selecciona…</option>
+                <option>Matutino</option>
+                <option>Vespertino</option>
+                <option>Nocturno</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label>Fecha de detección del evento</label>
+              <input type="date" id="f_FechaDeteccion">
+            </div>
+            <div class="campo">
+              <label>Médico tratante / personal involucrado</label>
+              <input type="text" id="f_MedicoTratante" placeholder="Nombre">
+            </div>
+          </div>
+
           <div class="grid2">
             <div class="campo">
               <label>Registrado por (jefe de turno / supervisor) *</label>
@@ -284,6 +309,37 @@
               <div class="campo"><label>Dosis</label><input type="text" id="f_MedicamentoDosis"></div>
               <div class="campo"><label>Vía de administración</label><input type="text" id="f_MedicamentoVia"></div>
               <div class="campo"><label>Lote</label><input type="text" id="f_MedicamentoLote"></div>
+            </div>
+
+            <div class="grid2">
+              <div class="campo">
+                <label>Seriedad</label>
+                <select id="f_Seriedad">
+                  <option value="No seria">No seria</option>
+                  <option value="Seria">Seria (muerte, riesgo vital, hospitalización/prolongación, discapacidad, anomalía congénita u otro criterio médicamente importante)</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label>Desenlace</label>
+                <select id="f_Desenlace">
+                  <option value="Desconocido">Desconocido / aún sin resolver</option>
+                  <option value="Recuperado">Recuperado</option>
+                  <option value="Recuperado con secuelas">Recuperado con secuelas</option>
+                  <option value="No recuperado">No recuperado aún</option>
+                  <option value="Fallecido">Fallecido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="seccion-titulo" style="margin-top:14px;">Evaluación de causalidad — Algoritmo de Naranjo</div>
+            <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">
+              Si aún no tienes toda la información para evaluar causalidad, deja las preguntas en
+              "No sabe" y complétalo después desde el detalle del evento en la pestaña Eventos.
+            </p>
+            <div id="bloqueNaranjoForm"></div>
+            <div class="kpi" style="max-width:260px;margin-top:6px;">
+              <div class="valor" id="f_naranjo_puntaje">—</div>
+              <div class="etiqueta" id="f_naranjo_clasificacion">Sin evaluar</div>
             </div>
           </div>
 
@@ -417,12 +473,78 @@
 /* ============================================================================
    CONFIGURACIÓN — EDITAR ANTES DE PUBLICAR
    ============================================================================ */
-const APPS_SCRIPT_URL = 'PEGAR_AQUI_LA_URL_DE_IMPLEMENTACION'; // termina en /exec
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwW3q-jkuXIHIz4iO2RSAKASyNTr7uXoYIK0KwbCsNaKiEl1YEgkinvfZRBmlbVx4ibeg/exec';
 const PIN_ACCESO = 'EVAD1';
 const LS_KEY = 'ea_cmga_v2';
 
 let eventosCache = [];
 let folioAbierto = null;
+
+/* ============================================================================
+   ALGORITMO DE NARANJO (evaluación de causalidad — farmacovigilancia)
+   Debe reflejar exactamente la misma tabla de puntos que calcularNaranjo_
+   en Codigo.gs. El puntaje mostrado aquí es solo una vista previa: el
+   servidor vuelve a calcularlo al guardar.
+   ============================================================================ */
+const PREGUNTAS_NARANJO = [
+  '¿Existen reportes previos concluyentes sobre esta reacción?',
+  '¿La reacción apareció después de administrar el medicamento sospechoso?',
+  '¿Mejoró al suspender el medicamento o al administrar un antagonista específico?',
+  '¿Reapareció la reacción al volver a administrar el medicamento?',
+  '¿Existen causas alternativas (distintas del medicamento) que expliquen la reacción?',
+  '¿Reapareció la reacción al administrar un placebo?',
+  '¿Se detectó el medicamento en sangre (u otros líquidos) en concentraciones tóxicas?',
+  '¿Fue más severa al aumentar la dosis, o menos severa al disminuirla?',
+  '¿El paciente tuvo una reacción similar en una exposición previa al mismo medicamento?',
+  '¿Se confirmó la reacción adversa por alguna evidencia objetiva?'
+];
+const PUNTOS_NARANJO_CLIENTE = [
+  [1, 0], [2, -1], [1, 0], [2, -1], [-1, 2],
+  [-1, 1], [1, 0], [1, 0], [1, 0], [1, 0]
+];
+
+function generarBloqueNaranjo(prefix, respuestasPrevias){
+  let html = '';
+  PREGUNTAS_NARANJO.forEach((pregunta, i) => {
+    const val = (respuestasPrevias && respuestasPrevias[i]) ? respuestasPrevias[i] : 'nosabe';
+    html += '<div class="naranjo-fila"><div class="pregunta">' + (i + 1) + '. ' + pregunta + '</div>' +
+      '<select id="' + prefix + i + '" onchange="calcularNaranjoCliente(\'' + prefix + '\')">' +
+      '<option value="nosabe"' + (val === 'nosabe' ? ' selected' : '') + '>No sabe</option>' +
+      '<option value="si"' + (val === 'si' ? ' selected' : '') + '>Sí</option>' +
+      '<option value="no"' + (val === 'no' ? ' selected' : '') + '>No</option>' +
+      '</select></div>';
+  });
+  return html;
+}
+
+function obtenerRespuestasNaranjo(prefix){
+  const respuestas = [];
+  for(let i = 0; i < PREGUNTAS_NARANJO.length; i++){
+    const el = document.getElementById(prefix + i);
+    respuestas.push(el ? el.value : 'nosabe');
+  }
+  return respuestas;
+}
+
+function calcularNaranjoCliente(prefix){
+  const respuestas = obtenerRespuestasNaranjo(prefix);
+  let total = 0;
+  respuestas.forEach((r, i) => {
+    if(r === 'si') total += PUNTOS_NARANJO_CLIENTE[i][0];
+    else if(r === 'no') total += PUNTOS_NARANJO_CLIENTE[i][1];
+  });
+  let clasificacion;
+  if(total >= 9) clasificacion = 'Definitiva';
+  else if(total >= 5) clasificacion = 'Probable';
+  else if(total >= 1) clasificacion = 'Posible';
+  else clasificacion = 'Dudosa';
+
+  const elPuntaje = document.getElementById(prefix + 'puntaje');
+  const elClasif = document.getElementById(prefix + 'clasificacion');
+  if(elPuntaje) elPuntaje.textContent = total;
+  if(elClasif) elClasif.textContent = clasificacion + ' (vista previa)';
+  return { puntaje: total, clasificacion: clasificacion };
+}
 
 /* ============================================================================
    LOGIN
@@ -517,8 +639,11 @@ function guardarEvento(e){
 
   const datos = {
     Area: document.getElementById('f_Area').value,
+    Turno: document.getElementById('f_Turno').value,
     FechaEvento: document.getElementById('f_FechaEvento').value,
     HoraEvento: document.getElementById('f_HoraEvento').value,
+    FechaDeteccion: document.getElementById('f_FechaDeteccion').value,
+    MedicoTratante: document.getElementById('f_MedicoTratante').value,
     RegistradoPor: document.getElementById('f_RegistradoPor').value,
     PacienteRef: document.getElementById('f_PacienteRef').value,
     TipoAlcance: alcance,
@@ -528,6 +653,9 @@ function guardarEvento(e){
     MedicamentoDosis: document.getElementById('f_MedicamentoDosis') ? document.getElementById('f_MedicamentoDosis').value : '',
     MedicamentoVia: document.getElementById('f_MedicamentoVia') ? document.getElementById('f_MedicamentoVia').value : '',
     MedicamentoLote: document.getElementById('f_MedicamentoLote') ? document.getElementById('f_MedicamentoLote').value : '',
+    Seriedad: alcance === 'Farmacovigilancia' ? document.getElementById('f_Seriedad').value : '',
+    Desenlace: alcance === 'Farmacovigilancia' ? document.getElementById('f_Desenlace').value : '',
+    NaranjoRespuestas: alcance === 'Farmacovigilancia' ? obtenerRespuestasNaranjo('f_naranjo_') : null,
     Descripcion: document.getElementById('f_Descripcion').value,
     Consecuencia: document.getElementById('f_Consecuencia').value,
     AccionesInmediatas: document.getElementById('f_AccionesInmediatas').value
@@ -547,6 +675,8 @@ function guardarEvento(e){
         document.getElementById('bloque-seguridad').style.display = 'none';
         document.getElementById('lbl-farmaco').classList.remove('marcada');
         document.getElementById('lbl-seguridad').classList.remove('marcada');
+        document.getElementById('f_FechaEvento').valueAsDate = new Date();
+        calcularNaranjoCliente('f_naranjo_');
         cargarEventos();
       } else {
         mostrarMensaje('error', 'Error al guardar: ' + resp.error);
@@ -693,7 +823,10 @@ function construirDetalle(ev){
 
   let html = '';
   html += filaDetalle('Área / Servicio', ev.Area);
+  html += filaDetalle('Turno', ev.Turno || '—');
   html += filaDetalle('Fecha y hora del evento', limpiarFolio(ev.FechaEvento) + ' ' + (ev.HoraEvento || ''));
+  html += filaDetalle('Fecha de detección', ev.FechaDeteccion ? limpiarFolio(ev.FechaDeteccion) : '—');
+  html += filaDetalle('Médico tratante / personal involucrado', ev.MedicoTratante || '—');
   html += filaDetalle('Registrado por', ev.RegistradoPor);
   html += filaDetalle('Paciente', ev.PacienteRef || '—');
   html += filaDetalle('Clasificación', ev.TipoAlcance + ' — ' + ev.Subtipo);
@@ -703,6 +836,32 @@ function construirDetalle(ev){
   html += filaDetalle('Descripción', ev.Descripcion);
   html += filaDetalle('Consecuencia / daño', ev.Consecuencia || '—');
   html += filaDetalle('Acciones inmediatas', ev.AccionesInmediatas || '—');
+
+  // Evaluación de farmacovigilancia (seriedad, desenlace, causalidad de Naranjo)
+  if(ev.TipoAlcance === 'Farmacovigilancia'){
+    let respuestasPrevias = null;
+    try{ respuestasPrevias = JSON.parse(ev.NaranjoRespuestas || 'null'); }catch(err){ respuestasPrevias = null; }
+
+    html += '<div class="seccion-titulo">Evaluación de farmacovigilancia</div>';
+    html += '<div class="grid2">';
+    html += '<div class="campo"><label>Seriedad</label><select id="m_Seriedad">' +
+      '<option value="No seria"' + (ev.Seriedad !== 'Seria' ? ' selected' : '') + '>No seria</option>' +
+      '<option value="Seria"' + (ev.Seriedad === 'Seria' ? ' selected' : '') + '>Seria</option>' +
+      '</select></div>';
+    const desenlaceActual = ev.Desenlace || 'Desconocido';
+    html += '<div class="campo"><label>Desenlace</label><select id="m_Desenlace">' +
+      ['Desconocido', 'Recuperado', 'Recuperado con secuelas', 'No recuperado', 'Fallecido'].map(op =>
+        '<option value="' + op + '"' + (desenlaceActual === op ? ' selected' : '') + '>' + op + '</option>'
+      ).join('') +
+      '</select></div>';
+    html += '</div>';
+    html += '<div class="seccion-titulo" style="margin-top:10px;">Algoritmo de Naranjo (causalidad)</div>';
+    html += generarBloqueNaranjo('m_naranjo_', respuestasPrevias);
+    html += '<div class="kpi" style="max-width:260px;margin:10px 0;">' +
+      '<div class="valor" id="m_naranjo_puntaje">' + (ev.NaranjoPuntaje !== undefined && ev.NaranjoPuntaje !== '' ? ev.NaranjoPuntaje : '—') + '</div>' +
+      '<div class="etiqueta" id="m_naranjo_clasificacion">' + (ev.NaranjoClasificacion || 'Sin evaluar') + '</div></div>';
+    html += '<button class="secundario" onclick="guardarFarmacovigilancia()">Guardar evaluación de farmacovigilancia</button>';
+  }
 
   // Flujo de estados
   html += '<div class="seccion-titulo">Estado del evento</div>';
@@ -779,6 +938,17 @@ function guardarAnalisis(){
     .then(resp => { if(resp.ok){ cargarEventosYReabrir(); } else alert('Error: ' + resp.error); });
 }
 
+function guardarFarmacovigilancia(){
+  if(!folioAbierto) return;
+  const datos = {
+    Seriedad: document.getElementById('m_Seriedad').value,
+    Desenlace: document.getElementById('m_Desenlace').value,
+    NaranjoRespuestas: obtenerRespuestasNaranjo('m_naranjo_')
+  };
+  llamarBackend('guardarFarmacovigilancia', { folio: folioAbierto, datos: datos })
+    .then(resp => { if(resp.ok){ cargarEventosYReabrir(); } else alert('Error: ' + resp.error); });
+}
+
 function guardarPlan(){
   if(!folioAbierto) return;
   const datos = {
@@ -848,6 +1018,9 @@ function barra(nombre, valor, max){
 
 /* Marcar fecha por defecto al abrir Nuevo evento */
 document.getElementById('f_FechaEvento').valueAsDate = new Date();
+
+/* Construir el cuestionario de Naranjo del formulario de Nuevo evento */
+document.getElementById('bloqueNaranjoForm').innerHTML = generarBloqueNaranjo('f_naranjo_', null);
 </script>
 </body>
 </html>
