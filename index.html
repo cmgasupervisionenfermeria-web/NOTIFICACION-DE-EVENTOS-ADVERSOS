@@ -279,27 +279,35 @@
 
           <div class="seccion-titulo">Clasificación del evento</div>
 
-          <div class="radioAlcance" id="radioAlcance">
-            <label id="lbl-farmaco"><input type="radio" name="alcance" value="Farmacovigilancia" onchange="cambioAlcance()"> Farmacovigilancia (medicamentos / vacunas)</label>
-            <label id="lbl-seguridad"><input type="radio" name="alcance" value="Seguridad del Paciente" onchange="cambioAlcance()"> Seguridad del paciente (general)</label>
+          <div class="campo">
+            <label>Tipo de evento *</label>
+            <select id="f_Clasificacion" onchange="cambioClasificacion()">
+              <option value="Cuasifalla">Cuasifalla (near miss — no llegó al paciente)</option>
+              <option value="Evento Adverso">Evento Adverso (con grado de daño)</option>
+              <option value="Evento Centinela">Evento Centinela (muerte o daño grave inesperado)</option>
+              <option value="RAM">Reacción Adversa a Medicamento (RAM)</option>
+            </select>
           </div>
 
-          <!-- Subtipo Farmacovigilancia -->
-          <div id="bloque-farmaco" style="display:none;">
+          <div class="campo" id="campoGrado" style="display:none;">
+            <label>Grado de daño (1 = mínimo — 5 = máximo) *</label>
+            <select id="f_Grado">
+              <option value="1">Grado 1 — Sin daño</option>
+              <option value="2">Grado 2 — Daño leve/temporal</option>
+              <option value="3">Grado 3 — Daño moderado, requiere intervención</option>
+              <option value="4">Grado 4 — Daño grave/permanente</option>
+              <option value="5">Grado 5 — Contribuyó a la muerte</option>
+            </select>
+          </div>
+
+          <!-- Solo para Reacción Adversa a Medicamento (RAM) -->
+          <div id="bloque-ram" style="display:none;">
             <div class="grid2">
               <div class="campo">
-                <label>Tipo *</label>
-                <select id="f_SubtipoFarmaco">
-                  <option value="Evento Adverso a Medicamento">Evento Adverso a Medicamento (EA)</option>
-                  <option value="RAM">Reacción Adversa a Medicamento (RAM)</option>
-                  <option value="ESAVI">Evento Supuestamente Atribuible a Vacunación e Inmunización (ESAVI)</option>
-                  <option value="Falta de eficacia">Falta de eficacia terapéutica</option>
-                </select>
-              </div>
-              <div class="campo">
-                <label>Medicamento / vacuna involucrado</label>
+                <label>Medicamento involucrado</label>
                 <input type="text" id="f_MedicamentoNombre" placeholder="Nombre">
               </div>
+              <div class="campo"></div>
             </div>
             <div class="grid3">
               <div class="campo"><label>Dosis</label><input type="text" id="f_MedicamentoDosis"></div>
@@ -336,30 +344,6 @@
             <div class="kpi" style="max-width:260px;margin-top:6px;">
               <div class="valor" id="f_naranjo_puntaje">—</div>
               <div class="etiqueta" id="f_naranjo_clasificacion">Sin evaluar</div>
-            </div>
-          </div>
-
-          <!-- Subtipo Seguridad del Paciente -->
-          <div id="bloque-seguridad" style="display:none;">
-            <div class="grid2">
-              <div class="campo">
-                <label>Tipo *</label>
-                <select id="f_SubtipoSeguridad" onchange="cambioSubtipoSeguridad()">
-                  <option value="Cuasifalla">Cuasifalla (near miss — no llegó al paciente)</option>
-                  <option value="Evento Adverso">Evento Adverso (con grado de daño)</option>
-                  <option value="Evento Centinela">Evento Centinela (muerte o daño grave inesperado)</option>
-                </select>
-              </div>
-              <div class="campo" id="campoGrado" style="display:none;">
-                <label>Grado de daño (1 = mínimo — 5 = máximo) *</label>
-                <select id="f_Grado">
-                  <option value="1">Grado 1 — Sin daño</option>
-                  <option value="2">Grado 2 — Daño leve/temporal</option>
-                  <option value="3">Grado 3 — Daño moderado, requiere intervención</option>
-                  <option value="4">Grado 4 — Daño grave/permanente</option>
-                  <option value="5">Grado 5 — Contribuyó a la muerte</option>
-                </select>
-              </div>
             </div>
           </div>
 
@@ -639,20 +623,12 @@ function activarVista(nombre){
 }
 
 /* ============================================================================
-   FORMULARIO — MOSTRAR/OCULTAR SEGÚN ALCANCE
+   FORMULARIO — MOSTRAR/OCULTAR SEGÚN CLASIFICACIÓN
    ============================================================================ */
-function cambioAlcance(){
-  const valor = document.querySelector('input[name="alcance"]:checked').value;
-  document.getElementById('bloque-farmaco').style.display = (valor === 'Farmacovigilancia') ? 'block' : 'none';
-  document.getElementById('bloque-seguridad').style.display = (valor === 'Seguridad del Paciente') ? 'block' : 'none';
-  document.getElementById('lbl-farmaco').classList.toggle('marcada', valor === 'Farmacovigilancia');
-  document.getElementById('lbl-seguridad').classList.toggle('marcada', valor === 'Seguridad del Paciente');
-  if(valor === 'Seguridad del Paciente') cambioSubtipoSeguridad();
-}
-
-function cambioSubtipoSeguridad(){
-  const sub = document.getElementById('f_SubtipoSeguridad').value;
-  document.getElementById('campoGrado').style.display = (sub === 'Evento Adverso') ? 'block' : 'none';
+function cambioClasificacion(){
+  const valor = document.getElementById('f_Clasificacion').value;
+  document.getElementById('campoGrado').style.display = (valor === 'Evento Adverso') ? 'block' : 'none';
+  document.getElementById('bloque-ram').style.display = (valor === 'RAM') ? 'block' : 'none';
 }
 
 /* ============================================================================
@@ -661,25 +637,18 @@ function cambioSubtipoSeguridad(){
 function guardarEvento(e){
   e.preventDefault();
 
-  const alcanceInput = document.querySelector('input[name="alcance"]:checked');
-  if(!alcanceInput){
-    mostrarMensaje('error', 'Selecciona el tipo de alcance (Farmacovigilancia o Seguridad del paciente).');
-    return false;
-  }
-  const alcance = alcanceInput.value;
-  let subtipo = '';
+  const subtipo = document.getElementById('f_Clasificacion').value;
+  // Internamente se sigue derivando TipoAlcance para reutilizar la lógica de
+  // farmacovigilancia (medicamento, seriedad/desenlace, Naranjo, filtros): RAM
+  // es Farmacovigilancia; Cuasifalla/Evento Adverso/Centinela son Seguridad
+  // del Paciente — aunque en el formulario ya no se pida por separado.
+  const alcance = (subtipo === 'RAM') ? 'Farmacovigilancia' : 'Seguridad del Paciente';
   let grado = '';
-
-  if(alcance === 'Farmacovigilancia'){
-    subtipo = document.getElementById('f_SubtipoFarmaco').value;
-  } else {
-    subtipo = document.getElementById('f_SubtipoSeguridad').value;
-    if(subtipo === 'Evento Adverso'){
-      grado = document.getElementById('f_Grado').value;
-    }
-    if(subtipo === 'Evento Centinela'){
-      grado = '5';
-    }
+  if(subtipo === 'Evento Adverso'){
+    grado = document.getElementById('f_Grado').value;
+  }
+  if(subtipo === 'Evento Centinela'){
+    grado = '5';
   }
 
   const datos = {
@@ -716,10 +685,8 @@ function guardarEvento(e){
       if(resp.ok){
         mostrarMensaje('ok', '✓ Evento guardado con folio ' + resp.resultado.folio + '.');
         document.getElementById('formEvento').reset();
-        document.getElementById('bloque-farmaco').style.display = 'none';
-        document.getElementById('bloque-seguridad').style.display = 'none';
-        document.getElementById('lbl-farmaco').classList.remove('marcada');
-        document.getElementById('lbl-seguridad').classList.remove('marcada');
+        document.getElementById('campoGrado').style.display = 'none';
+        document.getElementById('bloque-ram').style.display = 'none';
         document.getElementById('f_FechaEvento').valueAsDate = new Date();
         calcularNaranjoCliente('f_naranjo_');
         if(estaAutenticado()) cargarEventos(); // refresca el listado solo si ya se entró como supervisor
