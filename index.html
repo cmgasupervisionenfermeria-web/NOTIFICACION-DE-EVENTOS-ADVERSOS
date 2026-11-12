@@ -215,6 +215,7 @@
     <section id="vista-nuevo" class="vista activa">
       <div class="card">
         <h2>Registrar nuevo evento</h2>
+        <div id="avisoPrecarga" style="display:none;background:#eafbf5;border:1px solid var(--teal);color:var(--teal-dark);border-radius:8px;padding:10px 14px;font-size:12.5px;margin-bottom:14px;"></div>
         <form id="formEvento" onsubmit="return guardarEvento(event)">
 
           <div class="grid3">
@@ -1070,6 +1071,85 @@ document.getElementById('f_FechaEvento').valueAsDate = new Date();
 
 /* Construir el cuestionario de Naranjo del formulario de Nuevo evento */
 document.getElementById('bloqueNaranjoForm').innerHTML = generarBloqueNaranjo('f_naranjo_', null);
+
+/* ============================================================================
+   PRECARGA DESDE OTRAS APPS (botón "Reportar evento adverso" en Censo
+   Hospitalario / Censo Urgencias / Programación Quirúrgica).
+   Esas apps enlazan aquí con parámetros en la URL, por ejemplo:
+   ?origen=urgencias&area=Urgencias&paciente=Juan%20Perez%20-%20Cama%204&fecha=2026-11-12&turno=Matutino&medico=Dra.%20Lopez
+   ============================================================================ */
+const ORIGENES = {
+  'hospitalario': 'Censo Hospitalario',
+  'urgencias': 'Censo de Urgencias',
+  'quirurgica': 'Programación Quirúrgica'
+};
+
+function buscarOpcion(select, valor){
+  if(!valor) return null;
+  const objetivo = quitarAcentos(valor).toLowerCase().trim();
+  for(const opt of select.options){
+    if(quitarAcentos(opt.value || opt.textContent).toLowerCase().trim() === objetivo) return opt.value;
+  }
+  return null;
+}
+
+function precargarDesdeURL(){
+  const params = new URLSearchParams(window.location.search);
+  const origenParam = params.get('origen') || '';
+  const areaParam = params.get('area') || '';
+  const pacienteParam = params.get('paciente') || '';
+  const fechaParam = params.get('fecha') || '';
+  const turnoParam = params.get('turno') || '';
+  const medicoParam = params.get('medico') || '';
+  const notaParam = params.get('nota') || '';
+
+  const hayDatos = areaParam || pacienteParam || fechaParam || turnoParam || medicoParam || notaParam;
+  if(!hayDatos) return;
+
+  const notasSinMapear = [];
+  if(notaParam) notasSinMapear.push(notaParam);
+
+  if(areaParam){
+    const selArea = document.getElementById('f_Area');
+    const coincidencia = buscarOpcion(selArea, areaParam);
+    if(coincidencia){
+      selArea.value = coincidencia;
+    } else {
+      selArea.value = 'Otro';
+      notasSinMapear.push('Área / servicio de origen: ' + areaParam);
+    }
+  }
+
+  if(pacienteParam){
+    document.getElementById('f_PacienteRef').value = pacienteParam;
+  }
+
+  if(fechaParam && /^\d{4}-\d{2}-\d{2}$/.test(fechaParam)){
+    document.getElementById('f_FechaEvento').value = fechaParam;
+  }
+
+  if(turnoParam){
+    const selTurno = document.getElementById('f_Turno');
+    const coincidenciaTurno = buscarOpcion(selTurno, turnoParam);
+    if(coincidenciaTurno) selTurno.value = coincidenciaTurno;
+  }
+
+  if(medicoParam){
+    document.getElementById('f_MedicoTratante').value = medicoParam;
+  }
+
+  if(notasSinMapear.length){
+    const campoDesc = document.getElementById('f_Descripcion');
+    campoDesc.value = '(' + notasSinMapear.join(' · ') + ')\n' + campoDesc.value;
+  }
+
+  const nombreOrigen = ORIGENES[origenParam.toLowerCase()] || 'otra aplicación';
+  const aviso = document.getElementById('avisoPrecarga');
+  aviso.style.display = 'block';
+  aviso.innerHTML = '📥 Se precargaron datos desde <b>' + nombreOrigen + '</b>. Verifica la información antes de completar y guardar el evento.';
+}
+
+precargarDesdeURL();
 </script>
 </body>
 </html>
