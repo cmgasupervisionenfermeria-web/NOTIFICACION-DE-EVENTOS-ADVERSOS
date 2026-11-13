@@ -1,716 +1,1155 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Encuesta de Satisfacción · CMGA</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eventos Adversos — CMGA</title>
 <style>
-:root{
-  --navy:#1B3A6B; --teal:#1A8A6F; --bg:#F3F6FA; --card:#fff; --tx:#1d2733; --mut:#5f6b7a; --ln:#dbe2ea;
-  --e:#1A8A6F; --b:#5DB98F; --r:#E3A72F; --m:#C8423B; --na:#8a96a3;
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Arial,Helvetica,sans-serif}
-button{font-family:inherit}
-.top{background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:10px 18px;gap:12px;border-bottom:4px solid var(--navy);flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:12px}
-.brand img{height:62px;width:auto;display:block}
-#subTop{font-size:14px;font-weight:700;color:var(--navy);text-align:right}
-#subTop::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:8px;vertical-align:middle}
-@media (max-width:560px){.top{justify-content:center}.brand img{height:50px}#subTop{width:100%;text-align:center;font-size:13px}}
-.progress{height:6px;background:#dfe6ee}
-#bar{height:100%;width:0;background:var(--teal);transition:width .3s}
-main{max-width:860px;margin:0 auto;padding:18px 16px 110px}
-#vPanel{max-width:1200px;padding-bottom:40px}
-h2{color:var(--navy);margin:6px 0 4px;font-size:24px}
-.sub{color:var(--mut);margin:0 0 16px;font-size:15px}
-.q{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:12px}
-.qt{font-size:17px;font-weight:600;margin-bottom:10px;line-height:1.35}
-.qt .req{color:var(--m)}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-.op{flex:1 1 0;min-width:96px;border:2px solid var(--ln);background:#fff;border-radius:12px;padding:10px 6px;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tx);transition:transform .08s}
-.op:active{transform:scale(.97)}
-.op .f{font-size:26px;line-height:1}
-.op.txt{flex:0 1 auto;min-width:0;padding:12px 16px;flex-direction:row}
-.op.sel.e{background:var(--e);border-color:var(--e);color:#fff}
-.op.sel.b{background:var(--b);border-color:var(--b);color:#fff}
-.op.sel.r{background:var(--r);border-color:var(--r);color:#fff}
-.op.sel.m{background:var(--m);border-color:var(--m);color:#fff}
-.op.sel.na,.op.sel.g{background:var(--navy);border-color:var(--navy);color:#fff}
-.op.na{color:var(--mut)}
-.nps{display:grid;grid-template-columns:repeat(11,1fr);gap:5px}
-.nps .op{min-width:0;padding:12px 0;font-weight:700;font-size:17px}
-.nps .op.sel{color:#fff}
-.nps .op.sel.lo{background:var(--m);border-color:var(--m)}
-.nps .op.sel.mid{background:var(--r);border-color:var(--r)}
-.nps .op.sel.hi{background:var(--e);border-color:var(--e)}
-.npsl{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;margin-top:6px}
-input[type=text],input[type=tel],input[type=date],input[type=password],select,textarea{width:100%;font-size:16px;padding:12px;border:2px solid var(--ln);border-radius:10px;font-family:inherit;background:#fff;color:var(--tx)}
-textarea{min-height:110px;resize:vertical}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal)}
-.hint{color:var(--mut);font-size:13px;margin-top:6px}
-.cond{margin-top:10px}
-#navBtns{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);padding:12px 16px;display:flex;gap:10px;justify-content:center;z-index:5}
-#navBtns[hidden]{display:none}
-#navBtns .in{max-width:860px;width:100%;display:flex;gap:10px}
-.btn{border:0;border-radius:12px;padding:14px 20px;font-size:17px;font-weight:700;cursor:pointer}
-.btn.pri{background:var(--teal);color:#fff;flex:1}
-.btn.sec{background:#e8edf3;color:var(--navy)}
-.btn.nav{background:var(--navy);color:#fff}
-.btn.sm{padding:9px 14px;font-size:14px}
-.btn:disabled{opacity:.5}
-.skip{background:none;border:1px dashed var(--na);color:var(--mut);border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;margin-bottom:12px}
-.hero{text-align:center;padding:36px 10px}
-.hero h1{color:var(--navy);font-size:32px;margin:12px 0 10px}
-.hero p{font-size:18px;color:var(--mut);max-width:560px;margin:0 auto 8px;line-height:1.45}
-.hero .btn{margin-top:26px;font-size:22px;padding:18px 48px;flex:none}
-.pill{display:inline-block;background:#e3f2ec;color:var(--teal);padding:6px 12px;border-radius:20px;font-size:14px;font-weight:700}
-.secno{color:var(--teal);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.6px}
-.check{width:90px;height:90px;border-radius:50%;background:var(--teal);color:#fff;font-size:52px;display:flex;align-items:center;justify-content:center;margin:0 auto}
-footer{text-align:center;color:var(--mut);font-size:12px;padding:10px 10px 90px}
-footer a{color:var(--mut)}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tx);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;max-width:90vw;text-align:center}
-#toast.show{opacity:1}
-.ov{position:fixed;inset:0;background:rgba(20,30,45,.55);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
-.ov[hidden]{display:none}
-.mbox{background:#fff;border-radius:16px;padding:22px;max-width:460px;width:100%;max-height:90vh;overflow:auto}
-.mbox h3{margin:0 0 12px;color:var(--navy)}
-.mrow{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
-/* Panel */
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#fff;border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:16px}
-.toolbar label{font-size:12px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
-.toolbar input,.toolbar select{padding:8px;font-size:14px;width:auto}
-.toolbar .sp{flex:1}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:14px;border-top:4px solid var(--navy)}
-.kpi .l{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
-.kpi .v{font-size:30px;font-weight:700;color:var(--navy);margin:6px 0 2px}
-.kpi .d{font-size:12px;color:var(--mut)}
-.kpi.ok{border-top-color:var(--e)}.kpi.warn{border-top-color:var(--r)}.kpi.bad{border-top-color:var(--m)}
-.card{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:16px;margin-bottom:16px}
-.card h3{margin:0 0 4px;color:var(--navy);font-size:18px}
-.card .cs{color:var(--mut);font-size:13px;margin:0 0 12px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;border-bottom:2px solid var(--ln);padding:8px 6px}
-td{border-bottom:1px solid var(--ln);padding:8px 6px;vertical-align:middle}
-.barw{background:#eef2f6;border-radius:6px;height:14px;position:relative;min-width:120px}
-.barw>i{display:block;height:100%;border-radius:6px}
-.stk{display:flex;height:16px;border-radius:6px;overflow:hidden;min-width:160px;background:#eef2f6}
-.stk>i{display:block;height:100%}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-bottom:8px}
-.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--c)}
-details.area{border-top:1px solid var(--ln);padding:6px 0}
-.arow{display:grid;grid-template-columns:minmax(150px,26%) 1fr 90px 90px 80px;gap:10px;align-items:center;font-size:14px}
-.grp{background:#eef3f8;color:var(--navy);border-radius:8px;padding:8px 10px;margin:14px 0 4px;font-size:14px}
-.grp span{color:var(--mut);font-size:12px;margin-left:6px}
-.arow.hd{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;border-bottom:2px solid var(--ln);padding:8px 6px}
-details.area summary{cursor:pointer;color:var(--navy);font-weight:600;padding:10px 6px;list-style:none}
-details.area summary::-webkit-details-marker{display:none}
-details.area summary .nm::before{content:"▸ ";color:var(--mut)}
-details.area[open] summary .nm::before{content:"▾ "}
-details.area[open]{background:#fafbfd;border-radius:8px}
-@media (max-width:760px){.arow{grid-template-columns:1fr 70px 60px}.arow .bc,.arow .nn{display:none}}
-.tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:12px;font-weight:700}
-.tag.ok{background:#e3f2ec;color:var(--e)}.tag.warn{background:#fbf0d9;color:#9a6a0c}.tag.bad{background:#f8e1df;color:var(--m)}.tag.nt{background:#eef2f6;color:var(--mut)}
-.alert{border:1px solid var(--ln);border-left:5px solid var(--m);border-radius:10px;padding:12px;margin-bottom:10px}
-.alert.at{border-left-color:var(--e);opacity:.75}
-.alert.sg{border-left-color:var(--r)}
-.alert .h{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-size:14px}
-.alert .mot{margin:8px 0;font-size:14px}
-.alert .seg{display:grid;grid-template-columns:180px 1fr auto;gap:8px;align-items:start}
-.alert .seg select,.alert .seg input{padding:8px;font-size:14px}
-.com{border-bottom:1px solid var(--ln);padding:10px 0;font-size:14px}
-.com small{color:var(--mut)}
-.com .orig{margin-top:8px;background:#f3f6fa;border-left:3px solid var(--teal);border-radius:6px;padding:6px 10px;font-size:13px;color:var(--tx);line-height:1.5}
-.com .orig span{color:var(--mut);font-size:12px}
-.empty{color:var(--mut);font-size:14px;padding:8px 0}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.qrbox{display:flex;justify-content:center;margin:14px 0}
-#printWrap{display:none}
-@media (max-width:760px){.grid2{grid-template-columns:1fr}.alert .seg{grid-template-columns:1fr}.op{min-width:72px;font-size:13px}.op .f{font-size:22px}.hero h1{font-size:26px}}
-@media print{
-  body>*{display:none!important}
-  #printWrap{display:flex!important;justify-content:center;align-items:center;min-height:95vh}
-  .pcard{border:3px solid #1B3A6B;border-radius:18px;padding:36px 40px;text-align:center;width:420px;font-family:Arial}
-  .pcard .pl{background:#1B3A6B;color:#fff;font-weight:700;padding:8px 14px;border-radius:8px;display:inline-block}
-  .pcard h1{color:#1B3A6B;font-size:28px;margin:18px 0 6px}
-  .pcard p{color:#333;font-size:16px;margin:4px 0}
-  .pcard .pq{display:flex;justify-content:center;margin:22px 0}
-  .pcard .pf{color:#1A8A6F;font-weight:700;margin-top:10px}
-}
+  :root{
+    --navy:#1B3A6B;
+    --navy-dark:#122a4d;
+    --teal:#1A8A6F;
+    --teal-dark:#136e58;
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --border:#e0e4ea;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --rojo:#c0392b;
+    --naranja:#e08e0b;
+    --amarillo:#c9a227;
+    --verde:#2e8b57;
+    --gris:#7a8290;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--text);
+  }
+  /* ---------- MODAL DE PIN (acceso de gestión) ---------- */
+  .loginCard{
+    background:var(--card); border-radius:12px; padding:32px 28px; width:320px; max-width:100%;
+    box-shadow:0 12px 40px rgba(0,0,0,.25); text-align:center; margin:0 auto;
+  }
+  .loginCard h1{ font-size:17px; color:var(--navy); margin:0 0 4px; }
+  .loginCard p{ font-size:13px; color:var(--muted); margin:0 0 18px; }
+  .loginCard input{
+    width:100%; padding:12px; font-size:18px; text-align:center; letter-spacing:2px;
+    border:2px solid var(--border); border-radius:8px; margin-bottom:14px;
+  }
+  .loginCard button.btnEntrar{
+    width:100%; padding:12px; background:var(--teal); color:#fff; border:none; border-radius:8px;
+    font-size:15px; font-weight:bold; cursor:pointer;
+  }
+  .loginCard button.btnEntrar:hover{ background:var(--teal-dark); }
+  #errorLogin{ color:var(--rojo); font-size:13px; margin-top:10px; min-height:16px; }
+
+  /* ---------- APP SHELL ---------- */
+  header.top{
+    background:var(--navy); color:#fff; padding:14px 24px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  header.top h1{ font-size:17px; margin:0; }
+  header.top .sub{ font-size:12px; opacity:.8; }
+  .tabs{
+    display:flex; gap:4px; background:var(--navy-dark); padding:0 20px;
+  }
+  .tabs button{
+    background:transparent; border:none; color:#cfd8e6; padding:12px 18px; font-size:14px;
+    cursor:pointer; border-bottom:3px solid transparent;
+  }
+  .tabs button.activa{ color:#fff; border-bottom:3px solid var(--teal); font-weight:bold; }
+  main{ max-width:1100px; margin:0 auto; padding:22px 18px 60px; }
+  .vista{ display:none; }
+  .vista.activa{ display:block; }
+
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:20px; margin-bottom:18px;
+  }
+  .card h2{ font-size:16px; color:var(--navy); margin:0 0 14px; }
+
+  /* ---------- FORM ---------- */
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .grid2, .grid3{ grid-template-columns:1fr; } }
+  label{ display:block; font-size:12.5px; font-weight:bold; color:var(--navy); margin-bottom:5px; }
+  input, select, textarea{
+    width:100%; padding:9px 10px; font-size:14px; border:1px solid var(--border); border-radius:6px;
+    font-family:Arial, Helvetica, sans-serif; background:#fff;
+  }
+  textarea{ resize:vertical; min-height:64px; }
+  .campo{ margin-bottom:14px; }
+  .seccion-titulo{
+    font-size:13px; font-weight:bold; color:var(--teal-dark); text-transform:uppercase;
+    letter-spacing:.4px; margin:18px 0 10px; padding-top:12px; border-top:1px solid var(--border);
+  }
+  .radioAlcance{ display:flex; gap:16px; margin-bottom:16px; }
+  .radioAlcance label{
+    display:flex; align-items:center; gap:6px; font-weight:normal; color:var(--text);
+    border:1px solid var(--border); padding:10px 14px; border-radius:8px; cursor:pointer; flex:1;
+  }
+  .radioAlcance label.marcada{ border-color:var(--teal); background:#eafbf5; }
+  .radioAlcance input{ width:auto; }
+
+  button.primario{
+    background:var(--teal); color:#fff; border:none; padding:11px 22px; border-radius:7px;
+    font-size:14px; font-weight:bold; cursor:pointer;
+  }
+  button.primario:hover{ background:var(--teal-dark); }
+  button.primario:disabled{ background:#a9b6c4; cursor:not-allowed; }
+  button.secundario{
+    background:#fff; color:var(--navy); border:1px solid var(--navy); padding:9px 16px; border-radius:7px;
+    font-size:13px; cursor:pointer;
+  }
+  button.secundario:hover{ background:#eef2f8; }
+  button.peligro{ background:#fff; color:var(--rojo); border:1px solid var(--rojo); padding:9px 16px; border-radius:7px; font-size:13px; cursor:pointer; }
+
+  #msgGuardado{ margin-top:12px; font-size:13.5px; }
+  #msgGuardado.ok{ color:var(--teal-dark); font-weight:bold; }
+  #msgGuardado.error{ color:var(--rojo); font-weight:bold; }
+
+  /* ---------- LISTADO ---------- */
+  .filtros{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:flex-end; }
+  .filtros .campo{ margin-bottom:0; min-width:150px; }
+  .filtros .campo.busca{ flex:1; min-width:200px; }
+
+  table.eventos{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.eventos th{
+    text-align:left; padding:9px 8px; background:var(--navy); color:#fff; font-size:12px;
+    position:sticky; top:0;
+  }
+  table.eventos td{ padding:9px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+  table.eventos tr:hover{ background:#f7f9fc; cursor:pointer; }
+  .tablaWrap{ overflow-x:auto; }
+
+  .badge{
+    display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:bold;
+    color:#fff; white-space:nowrap;
+  }
+  .b-Registrado{ background:var(--gris); }
+  .b-En-analisis{ background:var(--amarillo); }
+  .b-Con-plan-de-accion{ background:var(--teal); }
+  .b-Cerrado{ background:var(--verde); }
+  .b-grado1, .b-grado2{ background:var(--verde); }
+  .b-grado3{ background:var(--naranja); }
+  .b-grado4, .b-grado5{ background:var(--rojo); }
+  .b-centinela{ background:#000; }
+  .b-farmaco{ background:var(--navy); }
+  .b-seguridad{ background:var(--teal-dark); }
+
+  /* ---------- MODAL ---------- */
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(15,25,40,.55); z-index:50;
+    align-items:flex-start; justify-content:center; padding:30px 16px; overflow-y:auto;
+  }
+  .overlay.activa{ display:flex; }
+  .modal{
+    background:#fff; border-radius:10px; max-width:760px; width:100%; padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.3);
+  }
+  .modal-header{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+  .modal-header h2{ margin:0; font-size:17px; color:var(--navy); }
+  .cerrarModal{ background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
+  .detalle-fila{ display:flex; gap:8px; font-size:13.5px; margin:4px 0; }
+  .detalle-fila b{ min-width:150px; color:var(--navy); }
+  .flujoEstados{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0; }
+  .flujoEstados button{
+    flex:1; min-width:120px; padding:9px; border-radius:7px; border:1px solid var(--border);
+    background:#fff; font-size:12.5px; cursor:pointer;
+  }
+  .flujoEstados button.actual{ background:var(--navy); color:#fff; border-color:var(--navy); font-weight:bold; }
+
+  /* ---------- INDICADORES ---------- */
+  .kpis{ display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; margin-bottom:20px; }
+  .kpi{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center; }
+  .kpi .valor{ font-size:26px; font-weight:bold; color:var(--navy); }
+  .kpi .etiqueta{ font-size:12px; color:var(--muted); margin-top:4px; }
+  .barra-fila{ display:flex; align-items:center; gap:10px; margin:8px 0; font-size:13px; }
+  .barra-fila .nombre{ width:150px; flex-shrink:0; }
+  .barra-fondo{ flex:1; background:#eef1f5; border-radius:6px; height:14px; overflow:hidden; }
+  .barra-relleno{ height:100%; background:var(--teal); }
+  .barra-fila .num{ width:30px; text-align:right; font-weight:bold; }
+
+  .naranjo-fila{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .naranjo-fila .pregunta{ flex:1; }
+  .naranjo-fila select{ width:130px; flex-shrink:0; }
+  @media (max-width:600px){ .naranjo-fila{ flex-direction:column; align-items:stretch; } .naranjo-fila select{ width:100%; } }
+
+  .vacio{ text-align:center; color:var(--muted); padding:30px; font-size:14px; }
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="brand"><img src="data:image/png;base64,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" alt="Centro Médico Galerías Aguascalientes"></div>
-  <div id="subTop">Encuesta de satisfacción al egreso</div>
-</header>
 
-<!-- ============ ENCUESTA ============ -->
-<div id="vEncuesta">
-  <div class="progress"><div id="bar"></div></div>
-  <main><section id="wizard"></section></main>
-  <div id="navBtns" hidden><div class="in">
-    <button class="btn sec" id="btnAtras">← Atrás</button>
-    <button class="btn pri" id="btnSig">Siguiente →</button>
-  </div></div>
-  <footer><span id="pendInfo"></span> <a href="#" id="lnkPanel">Acceso supervisión</a></footer>
+<!-- ================= MODAL DE PIN (solo para gestión: Eventos / Indicadores) ================= -->
+<div class="overlay" id="overlayPin">
+  <div class="loginCard">
+    <h1>Acceso de jefes de turno / supervisores</h1>
+    <p>Esta sección incluye datos de pacientes y el seguimiento de cada evento. Ingresa el PIN para continuar.</p>
+    <input type="password" id="inputPin" placeholder="PIN de acceso" maxlength="12" autocomplete="off">
+    <button class="btnEntrar" onclick="confirmarPin()">Ingresar</button>
+    <div id="errorLogin"></div>
+    <button class="secundario" style="margin-top:10px;width:100%;" onclick="cerrarModalPin()">Cancelar</button>
+  </div>
 </div>
 
-<!-- ============ PANEL ============ -->
-<main id="vPanel" hidden>
-  <div class="toolbar">
-    <label>Desde<input type="date" id="fDesde"></label>
-    <label>Hasta<input type="date" id="fHasta"></label>
-    <label>Servicio<select id="fServ"></select></label>
-    <button class="btn nav sm" id="btnRecargar">↻ Actualizar</button>
-    <div class="sp"></div>
-    <button class="btn sec sm" id="btnCSV">⬇ CSV</button>
-    <button class="btn sec sm" id="btnQR">▣ Código QR</button>
-    <button class="btn sec sm" id="btnSalir">Salir</button>
-  </div>
-  <div class="kpis" id="kpis"></div>
-  <div class="card">
-    <h3>Satisfacción por área</h3>
-    <p class="cs">% de respuestas Excelente + Bueno sobre respuestas válidas (sin N/A). Meta: ≥ 90 %. Haga clic en un área para ver cada pregunta.</p>
-    <div id="tblAreas"></div>
-  </div>
-  <div class="grid2">
-    <div class="card"><h3>Seguridad y trato digno</h3><p class="cs">% de respuestas "Sí" (en 8.6, "Sí" es negativo: hubo un incidente sin resolver).</p><div id="tblSeg"></div></div>
-    <div class="card"><h3>Tendencia mensual</h3><p class="cs">Satisfacción global por mes, últimos 12 meses (respeta el filtro de servicio).</p><div id="tendencia"></div></div>
-  </div>
-  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en 8.1–8.5 o un incidente sin resolver (8.6). Turnar al jefe de área en ≤ 48 h.</p><div id="alertas"></div></div>
-  <div class="grid2">
-    <div class="card"><h3>Quejas y sugerencias</h3><div id="comentarios"></div></div>
-    <div class="card"><h3>Reconocimientos</h3><div id="reconoc"></div></div>
-  </div>
-</main>
+<!-- ================= APP ================= -->
+<div id="app">
+  <header class="top">
+    <div>
+      <h1>Reporte y Registro de Eventos Adversos</h1>
+      <div class="sub">CMGA · Farmacovigilancia (NOM-220-SSA1-2016) y Seguridad del Paciente</div>
+    </div>
+    <button class="secundario" id="btnSesion" onclick="botonSesionClick()" style="background:transparent;color:#fff;border-color:#fff;">🔒 Acceso de supervisión</button>
+  </header>
 
-<div class="ov" id="ov" hidden><div class="mbox" id="mbox"></div></div>
-<div id="toast"></div>
-<div id="printWrap"></div>
+  <div class="tabs">
+    <button id="tabBtn-nuevo" class="activa" onclick="mostrarVista('nuevo')">➕ Nuevo evento</button>
+    <button id="tabBtn-eventos" onclick="mostrarVista('eventos')">📋 Eventos (supervisión)</button>
+    <button id="tabBtn-indicadores" onclick="mostrarVista('indicadores')">📊 Indicadores (supervisión)</button>
+  </div>
+
+  <main>
+
+    <!-- ============ VISTA: NUEVO EVENTO ============ -->
+    <section id="vista-nuevo" class="vista activa">
+      <div class="card">
+        <h2>Registrar nuevo evento</h2>
+        <div id="avisoPrecarga" style="display:none;background:#eafbf5;border:1px solid var(--teal);color:var(--teal-dark);border-radius:8px;padding:10px 14px;font-size:12.5px;margin-bottom:14px;"></div>
+        <form id="formEvento" onsubmit="return guardarEvento(event)">
+
+          <div class="grid3">
+            <div class="campo">
+              <label>Área / Servicio *</label>
+              <select id="f_Area" required>
+                <option value="">Selecciona…</option>
+                <option>Hospitalización</option>
+                <option>UCI</option>
+                <option>UCIM</option>
+                <option>Urgencias</option>
+                <option>Quirófano</option>
+                <option>Recuperación quirúrgica</option>
+                <option>Endoscopia</option>
+                <option>Consulta externa</option>
+                <option>Farmacia</option>
+                <option>Laboratorio</option>
+                <option>Imagenología</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label>Fecha del evento *</label>
+              <input type="date" id="f_FechaEvento" required>
+            </div>
+            <div class="campo">
+              <label>Hora del evento</label>
+              <input type="time" id="f_HoraEvento">
+            </div>
+          </div>
+
+          <div class="grid3">
+            <div class="campo">
+              <label>Turno</label>
+              <select id="f_Turno">
+                <option value="">Selecciona…</option>
+                <option>Matutino</option>
+                <option>Vespertino</option>
+                <option>Nocturno</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label>Fecha de detección del evento</label>
+              <input type="date" id="f_FechaDeteccion">
+            </div>
+            <div class="campo">
+              <label>Médico tratante / personal involucrado</label>
+              <input type="text" id="f_MedicoTratante" placeholder="Nombre">
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="campo">
+              <label>Nombre de quien reporta *</label>
+              <input type="text" id="f_RegistradoPor" required placeholder="Nombre completo (quien detecta o reporta el evento)">
+            </div>
+            <div class="campo">
+              <label>Paciente (nombre o número de expediente)</label>
+              <input type="text" id="f_PacienteRef" placeholder="Opcional si el evento no involucra a un paciente identificado">
+            </div>
+          </div>
+
+          <div class="seccion-titulo">Clasificación del evento</div>
+
+          <div class="campo">
+            <label>Tipo de evento *</label>
+            <select id="f_Clasificacion" onchange="cambioClasificacion()">
+              <option value="Cuasifalla">Cuasifalla (near miss — no llegó al paciente)</option>
+              <option value="Evento Adverso">Evento Adverso (con grado de daño)</option>
+              <option value="Evento Centinela">Evento Centinela (muerte o daño grave inesperado)</option>
+              <option value="RAM">Reacción Adversa a Medicamento (RAM)</option>
+            </select>
+          </div>
+
+          <div class="campo" id="campoGrado" style="display:none;">
+            <label>Grado de daño (1 = mínimo — 5 = máximo) *</label>
+            <select id="f_Grado">
+              <option value="1">Grado 1 — Sin daño</option>
+              <option value="2">Grado 2 — Daño leve/temporal</option>
+              <option value="3">Grado 3 — Daño moderado, requiere intervención</option>
+              <option value="4">Grado 4 — Daño grave/permanente</option>
+              <option value="5">Grado 5 — Contribuyó a la muerte</option>
+            </select>
+          </div>
+
+          <!-- Solo para Reacción Adversa a Medicamento (RAM) -->
+          <div id="bloque-ram" style="display:none;">
+            <div class="grid2">
+              <div class="campo">
+                <label>Medicamento involucrado</label>
+                <input type="text" id="f_MedicamentoNombre" placeholder="Nombre">
+              </div>
+              <div class="campo"></div>
+            </div>
+            <div class="grid3">
+              <div class="campo"><label>Dosis</label><input type="text" id="f_MedicamentoDosis"></div>
+              <div class="campo"><label>Vía de administración</label><input type="text" id="f_MedicamentoVia"></div>
+              <div class="campo"><label>Lote</label><input type="text" id="f_MedicamentoLote"></div>
+            </div>
+
+            <div class="grid2">
+              <div class="campo">
+                <label>Seriedad</label>
+                <select id="f_Seriedad">
+                  <option value="No seria">No seria</option>
+                  <option value="Seria">Seria (muerte, riesgo vital, hospitalización/prolongación, discapacidad, anomalía congénita u otro criterio médicamente importante)</option>
+                </select>
+              </div>
+              <div class="campo">
+                <label>Desenlace</label>
+                <select id="f_Desenlace">
+                  <option value="Desconocido">Desconocido / aún sin resolver</option>
+                  <option value="Recuperado">Recuperado</option>
+                  <option value="Recuperado con secuelas">Recuperado con secuelas</option>
+                  <option value="No recuperado">No recuperado aún</option>
+                  <option value="Fallecido">Fallecido</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="seccion-titulo" style="margin-top:14px;">Evaluación de causalidad — Algoritmo de Naranjo</div>
+            <p style="font-size:12.5px;color:var(--muted);margin:-6px 0 10px;">
+              Si aún no tienes toda la información para evaluar causalidad, deja las preguntas en
+              "No sabe" y complétalo después desde el detalle del evento en la pestaña Eventos.
+            </p>
+            <div id="bloqueNaranjoForm"></div>
+            <div class="kpi" style="max-width:260px;margin-top:6px;">
+              <div class="valor" id="f_naranjo_puntaje">—</div>
+              <div class="etiqueta" id="f_naranjo_clasificacion">Sin evaluar</div>
+            </div>
+          </div>
+
+          <div class="seccion-titulo">Descripción</div>
+          <div class="campo">
+            <label>Descripción del evento *</label>
+            <textarea id="f_Descripcion" required placeholder="Qué ocurrió, cómo se detectó, personas involucradas…"></textarea>
+          </div>
+          <div class="grid2">
+            <div class="campo">
+              <label>Consecuencia / daño al paciente</label>
+              <textarea id="f_Consecuencia" placeholder="Describir el daño, o 'Ninguno' si aplica"></textarea>
+            </div>
+            <div class="campo">
+              <label>Acciones inmediatas tomadas</label>
+              <textarea id="f_AccionesInmediatas"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="primario" id="btnGuardarEvento">Guardar evento</button>
+          <div id="msgGuardado"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ VISTA: EVENTOS ============ -->
+    <section id="vista-eventos" class="vista">
+      <div class="card">
+        <div class="toolbar">
+          <h2 style="margin:0;">Eventos registrados</h2>
+          <button class="secundario" onclick="cargarEventos()">🔄 Actualizar</button>
+        </div>
+        <div id="errorEventos" style="display:none;color:var(--rojo);font-size:13px;margin-bottom:12px;font-weight:bold;"></div>
+        <div class="filtros">
+          <div class="campo busca">
+            <label>Buscar (folio, área, descripción)</label>
+            <input type="text" id="filtroBusqueda" oninput="renderTabla()" placeholder="Escribe para buscar…">
+          </div>
+          <div class="campo">
+            <label>Estado</label>
+            <select id="filtroEstado" onchange="renderTabla()">
+              <option value="">Todos</option>
+              <option>Registrado</option>
+              <option>En análisis</option>
+              <option>Con plan de acción</option>
+              <option>Cerrado</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Alcance</label>
+            <select id="filtroTipo" onchange="renderTabla()">
+              <option value="">Todos</option>
+              <option value="Farmacovigilancia">Farmacovigilancia</option>
+              <option value="Seguridad del Paciente">Seguridad del paciente</option>
+            </select>
+          </div>
+        </div>
+        <div class="tablaWrap">
+          <table class="eventos" id="tablaEventos">
+            <thead>
+              <tr>
+                <th>Folio</th><th>Fecha</th><th>Área</th><th>Clasificación</th><th>Grado</th><th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpoTabla"></tbody>
+          </table>
+          <div id="tablaVacia" class="vacio" style="display:none;">No hay eventos que coincidan con el filtro.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VISTA: INDICADORES ============ -->
+    <section id="vista-indicadores" class="vista">
+      <div class="card">
+        <div class="toolbar">
+          <h2 style="margin:0;">Indicadores</h2>
+          <button class="secundario" onclick="cargarIndicadores()">🔄 Actualizar</button>
+        </div>
+        <div id="errorIndicadores" style="display:none;color:var(--rojo);font-size:13px;margin-bottom:12px;font-weight:bold;"></div>
+        <div class="kpis" id="kpisPrincipales"></div>
+        <div class="grid2">
+          <div>
+            <div class="seccion-titulo" style="margin-top:0;">Distribución por grado de daño</div>
+            <div id="barrasGrado"></div>
+          </div>
+          <div>
+            <div class="seccion-titulo" style="margin-top:0;">Top 5 áreas con más eventos</div>
+            <div id="barrasAreas"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= MODAL DETALLE ================= -->
+<div class="overlay" id="overlayDetalle">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalFolio">Evento</h2>
+      <button class="cerrarModal" onclick="cerrarModal()">×</button>
+    </div>
+    <div id="modalContenido"></div>
+  </div>
+</div>
 
 <script>
-/* ===================== CONFIGURACIÓN ===================== */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzHJcK6JRmEa5xYznZ62jgClOB_hy9hvDFZb39r8TCm7vGQ5-hLqbKVHZsZnw4FCHOZ/exec';
-const LS_PEND = 'encuesta_cmga_pend_v1';
-const RESET_SEG = 20;          // segundos en la pantalla de "Gracias" antes de reiniciar
-const INACTIVIDAD_MIN = 4;     // minutos sin tocar la pantalla a media encuesta antes de preguntar si sigue ahí
-const META = 90;               // % meta de satisfacción
-const LOGO_SRC = document.querySelector('.brand img').src;   // logo incrustado en el encabezado
+/* ============================================================================
+   CONFIGURACIÓN — EDITAR ANTES DE PUBLICAR
+   ============================================================================ */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwW3q-jkuXIHIz4iO2RSAKASyNTr7uXoYIK0KwbCsNaKiEl1YEgkinvfZRBmlbVx4ibeg/exec';
+const PIN_ACCESO = 'EVAD1';
+const LS_KEY = 'ea_cmga_v2';
 
-/* ===================== CUESTIONARIO ===================== */
-const ESCALA = [
-  {v:'E',t:'Excelente',c:'e',f:'😀'},
-  {v:'B',t:'Bueno',c:'b',f:'🙂'},
-  {v:'R',t:'Regular',c:'r',f:'😐'},
-  {v:'M',t:'Malo',c:'m',f:'🙁'}
-];
-const NA = {v:'NA',t:'No aplica',c:'na',f:'—'};
-const AREAS = [
-  {id:'adm',titulo:'Admisión',ico:'🏥',items:[
-    ['a1','Tiempo de espera para su ingreso'],
-    ['a2','Amabilidad y trato del personal de Admisión'],
-    ['a3','Claridad de la información sobre trámites, costos estimados y documentos requeridos'],
-    ['a4','Explicación del reglamento, horarios de visita y derechos del paciente'],
-    ['a5','Rapidez para asignarle y llevarle a su habitación']]},
-  {id:'enf',titulo:'Enfermería',ico:'🩺',items:[
-    ['e1','El personal de enfermería se presentó y le llamó por su nombre'],
-    ['e2','Amabilidad, respeto y trato digno'],
-    ['e3','Rapidez para atender el timbre o sus llamados'],
-    ['e4','Le explicaron los procedimientos antes de realizarlos'],
-    ['e5','Atención oportuna de su dolor o molestias'],
-    ['e6','Le explicaron qué medicamentos le administraban y para qué'],
-    ['e7','Respeto a su privacidad e intimidad durante su atención'],
-    ['e8','Información y orientación sobre sus cuidados en casa al egreso']]},
-  {id:'med',titulo:'Atención médica',ico:'👨‍⚕️',items:[
-    ['m1','Su médico le visitó con la frecuencia que esperaba'],
-    ['m2','Le explicó su diagnóstico y tratamiento en palabras claras'],
-    ['m3','Resolvió sus dudas y las de su familia'],
-    ['m4','Le pidió su autorización (consentimiento) antes de procedimientos o cirugía'],
-    ['m5','Le dio indicaciones claras para su recuperación y citas de seguimiento']]},
-  {id:'nut',titulo:'Alimentos y nutrición',ico:'🍽️',skip:'No recibí alimentos del hospital',items:[
-    ['n1','Sabor y presentación de los alimentos'],
-    ['n2','Temperatura adecuada de los alimentos'],
-    ['n3','Puntualidad en el horario de entrega'],
-    ['n4','Le explicaron la dieta indicada por su médico'],
-    ['n5','Amabilidad del personal que le llevó los alimentos']]},
-  {id:'int',titulo:'Intendencia, limpieza y confort',ico:'🧹',items:[
-    ['i1','Limpieza de su habitación'],
-    ['i2','Limpieza y abasto del baño (papel, jabón, toallas)'],
-    ['i3','Limpieza de pasillos, salas de espera y áreas comunes'],
-    ['i4','Cambio de ropa de cama cuando fue necesario'],
-    ['i5','Amabilidad y discreción del personal de intendencia'],
-    ['i6','Comodidad de la habitación (temperatura, ruido, iluminación)'],
-    ['i7','Funcionamiento del equipo de la habitación (cama, TV, timbre, aire)']]},
-  {id:'lab',titulo:'Laboratorio e imagen',ico:'🔬',skip:'No me hicieron estudios',items:[
-    ['l1','Amabilidad del personal de laboratorio'],
-    ['l2','Habilidad al tomarle muestras (sin molestias innecesarias)'],
-    ['l3','Trato y explicación en Rayos X, ultrasonido o tomografía'],
-    ['l4','Tiempo de espera para realizar sus estudios']]},
-  {id:'caj',titulo:'Cajas y proceso de egreso',ico:'💳',items:[
-    ['c1','Amabilidad y atención del personal de Cajas'],
-    ['c2','Claridad en la explicación de su estado de cuenta'],
-    ['c3','El cobro correspondió a lo que le informaron al ingreso'],
-    ['c4','Tiempo de espera para pagar y recibir su alta administrativa'],
-    ['c5','Apoyo con trámites de aseguradora o facturación'],
-    ['c6','Tiempo total desde que le dieron el alta médica hasta salir del hospital']]}
-];
-const SEG = [
-  ['s1','¿Le colocaron un brazalete de identificación al ingresar?'],
-  ['s2','Antes de darle medicamentos o tomarle muestras, ¿confirmaron su nombre?'],
-  ['s3','¿Vio al personal lavarse las manos o usar gel antes de atenderle?'],
-  ['s4','¿Le informaron cómo prevenir caídas (barandales, pedir ayuda para levantarse)?'],
-  ['s5','¿Se sintió seguro(a) y protegido(a) durante su estancia?'],
-  ['s6','¿Tuvo algún problema o incidente que no fue resuelto?']
-];
-/* ---------- Preguntas exclusivas de URGENCIAS (se usan cuando el servicio elegido es "Urgencias") ---------- */
-const AREAS_URG = [
-  {id:'urec',titulo:'Recepción de Urgencias',ico:'🚑',items:[
-    ['ur1','Tiempo de espera desde su llegada hasta ser recibido'],
-    ['ur2','Amabilidad y trato del personal de recepción'],
-    ['ur3','Tiempo para que le valoraran por primera vez (triage)'],
-    ['ur4','Claridad de la información sobre trámites, costos estimados y documentos requeridos'],
-    ['ur5','Le mantuvieron informado(a) mientras esperaba']]},
-  {id:'uenf',titulo:'Enfermería de Urgencias',ico:'🩺',items:[
-    ['ue1','El personal de enfermería se presentó y le llamó por su nombre'],
-    ['ue2','Amabilidad, respeto y trato digno'],
-    ['ue3','Rapidez para atenderle cuando lo necesitó'],
-    ['ue4','Le explicaron los procedimientos antes de realizarlos (canalización, curación, toma de muestras)'],
-    ['ue5','Atención oportuna de su dolor o molestias'],
-    ['ue6','Le explicaron qué medicamentos le administraban y para qué'],
-    ['ue7','Respeto a su privacidad e intimidad durante su atención']]},
-  {id:'umed',titulo:'Médicos de Urgencias',ico:'👨‍⚕️',items:[
-    ['um1','Tiempo de espera para ser atendido por el médico'],
-    ['um2','Le explicó su diagnóstico y tratamiento en palabras claras'],
-    ['um3','Resolvió sus dudas y las de su familia'],
-    ['um4','Le pidió su autorización (consentimiento) antes de procedimientos'],
-    ['um5','Le informó qué estudios le realizaron y sus resultados'],
-    ['um6','Le dio indicaciones claras para su egreso (medicamentos, signos de alarma, cuándo regresar)']]},
-  {id:'ulim',titulo:'Limpieza y confort',ico:'🧹',items:[
-    ['ul1','Limpieza de la sala de espera'],
-    ['ul2','Limpieza del cubículo o camilla donde le atendieron'],
-    ['ul3','Limpieza y abasto de los baños (papel, jabón, toallas)'],
-    ['ul4','Comodidad de la sala de espera (asientos, temperatura, ruido)'],
-    ['ul5','Amabilidad y discreción del personal de intendencia']]},
-  {id:'uegr',titulo:'Proceso de egreso de Urgencias',ico:'💳',items:[
-    ['uc1','Amabilidad y atención del personal de Cajas'],
-    ['uc2','Claridad en la explicación de su estado de cuenta'],
-    ['uc3','El cobro correspondió a lo que le informaron'],
-    ['uc4','Tiempo desde que le dieron de alta hasta que pudo salir de Urgencias'],
-    ['uc5','Apoyo con trámites de aseguradora o facturación']]}
-];
-const SEG_URG_TXT = {
-  s1:'¿Le colocaron un brazalete de identificación?',
-  s4:'¿Cuidaron que no se cayera (barandales de la camilla, ayudarle al moverse)?',
-  s5:'¿Se sintió seguro(a) y protegido(a) durante su atención en Urgencias?'
-};
-const ESTANCIAS_URG = ['Menos de 2 horas','2 a 4 horas','4 a 6 horas','6 a 12 horas','Más de 12 horas'];
-const DESTINOS_URG = ['Alta a su domicilio','Pasó a hospitalización','Traslado a otro hospital'];
-const esUrg = s => s==='Urgencias';
-const areasDe = serv => esUrg(serv) ? AREAS_URG : AREAS;
-const TODAS_AREAS = AREAS.concat(AREAS_URG);
-const GLOBAL = [['g1','Calificación general de la atención en CMGA'],['g2','Relación entre la calidad del servicio y el costo']];
-const SERVICIOS = ['Hospitalización','Terapia Intermedia','Terapia Intensiva','Urgencias','Imagen'];
-const ESTANCIAS = ['1 día','2 a 3 días','4 a 7 días','Más de 7 días'];
-const RESPONDE = ['Paciente','Familiar','Otro'];
-const ETIQ = {};
-AREAS.forEach(a=>a.items.forEach(([k,t])=>ETIQ[k]=a.titulo+': '+t));
-AREAS_URG.forEach(a=>a.items.forEach(([k,t])=>ETIQ[k]=a.titulo+': '+t));
-SEG.forEach(([k,t])=>ETIQ[k]='Seguridad: '+t);
-GLOBAL.forEach(([k,t])=>ETIQ[k]='Global: '+t);
+let eventosCache = [];
+let folioAbierto = null;
 
-/* Los pasos dependen del servicio elegido: Urgencias tiene sus propias secciones */
-function pasos(){
-  return [{id:'inicio'},{id:'datos',titulo:'Datos generales'}]
-    .concat(areasDe(R.servicio).map(a=>({id:a.id,titulo:a.titulo,area:a})))
-    .concat([{id:'seg',titulo:'Seguridad y trato digno'},{id:'global',titulo:'Evaluación global'},{id:'coment',titulo:'Quejas y sugerencias'},{id:'fin'}]);
+/* ============================================================================
+   ALGORITMO DE NARANJO (evaluación de causalidad — farmacovigilancia)
+   Debe reflejar exactamente la misma tabla de puntos que calcularNaranjo_
+   en Codigo.gs. El puntaje mostrado aquí es solo una vista previa: el
+   servidor vuelve a calcularlo al guardar.
+   ============================================================================ */
+const PREGUNTAS_NARANJO = [
+  '¿Existen reportes previos concluyentes sobre esta reacción?',
+  '¿La reacción apareció después de administrar el medicamento sospechoso?',
+  '¿Mejoró al suspender el medicamento o al administrar un antagonista específico?',
+  '¿Reapareció la reacción al volver a administrar el medicamento?',
+  '¿Existen causas alternativas (distintas del medicamento) que expliquen la reacción?',
+  '¿Reapareció la reacción al administrar un placebo?',
+  '¿Se detectó el medicamento en sangre (u otros líquidos) en concentraciones tóxicas?',
+  '¿Fue más severa al aumentar la dosis, o menos severa al disminuirla?',
+  '¿El paciente tuvo una reacción similar en una exposición previa al mismo medicamento?',
+  '¿Se confirmó la reacción adversa por alguna evidencia objetiva?'
+];
+const PUNTOS_NARANJO_CLIENTE = [
+  [1, 0], [2, -1], [1, 0], [2, -1], [-1, 2],
+  [-1, 1], [1, 0], [1, 0], [1, 0], [1, 0]
+];
+
+function generarBloqueNaranjo(prefix, respuestasPrevias){
+  let html = '';
+  PREGUNTAS_NARANJO.forEach((pregunta, i) => {
+    const val = (respuestasPrevias && respuestasPrevias[i]) ? respuestasPrevias[i] : 'nosabe';
+    html += '<div class="naranjo-fila"><div class="pregunta">' + (i + 1) + '. ' + pregunta + '</div>' +
+      '<select id="' + prefix + i + '" onchange="calcularNaranjoCliente(\'' + prefix + '\')">' +
+      '<option value="nosabe"' + (val === 'nosabe' ? ' selected' : '') + '>No sabe</option>' +
+      '<option value="si"' + (val === 'si' ? ' selected' : '') + '>Sí</option>' +
+      '<option value="no"' + (val === 'no' ? ' selected' : '') + '>No</option>' +
+      '</select></div>';
+  });
+  return html;
 }
 
-/* ===================== UTILIDADES ===================== */
-const $ = s=>document.querySelector(s);
-const esc = s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let toastT;
-function toast(m,ms=2600){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms);}
-function nuevoId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);}
-function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
-function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-async function api(body){
-  const r = await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'});
-  const j = await r.json();
-  if(!j.ok) throw new Error(j.error||'Error del servidor');
-  return j;
-}
-function hoyStr(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-
-/* ===================== ENCUESTA ===================== */
-let paso = 0, R = {}, idCliente = null, resetT = null;
-
-function opBtn(k,o,extra=''){
-  const sel = R[k]===o.v ? ' sel':'';
-  return `<button type="button" class="op ${o.c||'g'}${sel} ${extra}" data-k="${k}" data-v="${esc(o.v)}">${o.f?`<span class="f">${o.f}</span>`:''}<span>${esc(o.t)}</span></button>`;
-}
-function textOps(k,lista){return `<div class="opts">${lista.map(t=>opBtn(k,{v:t,t:t,c:'g'},'txt')).join('')}</div>`;}
-function rating(k,texto,conNA=true){
-  const ops = ESCALA.concat(conNA?[NA]:[]);
-  return `<div class="q" id="q_${k}"><div class="qt">${esc(texto)}</div><div class="opts">${ops.map(o=>opBtn(k,o)).join('')}</div></div>`;
-}
-function inputTxt(k,ph,tipo='text'){return `<input type="${tipo}" data-k="${k}" value="${esc(R[k]||'')}" placeholder="${esc(ph)}" maxlength="120">`;}
-function areaTxt(k,ph){return `<textarea data-k="${k}" placeholder="${esc(ph)}" maxlength="1000">${esc(R[k]||'')}</textarea>`;}
-
-function render(){
-  const p = pasos()[paso], w = $('#wizard');
-  const total = pasos().length-2;
-  $('#bar').style.width = (paso<=0?0:Math.min(100,(paso/(pasos().length-1))*100))+'%';
-  $('#navBtns').hidden = (p.id==='inicio'||p.id==='fin');
-  $('#btnSig').textContent = p.id==='coment' ? 'Enviar encuesta ✓' : 'Siguiente →';
-  let h = '';
-  const cab = t => `<div class="secno">Sección ${paso} de ${total}</div><h2>${t}</h2>`;
-  if(p.id==='inicio'){
-    h = `<div class="hero">
-      <span class="pill">Toma alrededor de 3 minutos</span>
-      <h1>Su opinión nos ayuda a mejorar</h1>
-      <p>Califique la atención que recibió durante su estancia. La encuesta es <b>anónima y voluntaria</b>; sus respuestas no afectan su atención ni su cuenta.</p>
-      <p>Puede contestarla el paciente o un familiar.</p>
-      <button class="btn pri" data-act="comenzar">Comenzar</button></div>`;
-  } else if(p.id==='datos'){
-    h = cab('Datos generales') + `<p class="sub">Nos ayudan a saber a qué área enviar sus comentarios.</p>
-      <div class="q"><div class="qt">Servicio donde estuvo <span class="req">*</span></div>${textOps('servicio',SERVICIOS)}</div>
-      <div class="q"><div class="qt">${esUrg(R.servicio)?'Cubículo o cama donde le atendieron':'Número de habitación'} <span class="req">*</span></div>${inputTxt('habitacion',esUrg(R.servicio)?'Ej. Cubículo 3':'Ej. 205')}</div>
-      <div class="q"><div class="qt">${esUrg(R.servicio)?'Tiempo que estuvo en Urgencias':'Días de estancia'}</div>${textOps('estancia',esUrg(R.servicio)?ESTANCIAS_URG:ESTANCIAS)}</div>
-      <div class="q"><div class="qt">¿Quién responde la encuesta?</div>${textOps('responde',RESPONDE)}
-        <div class="cond" id="c_respondeOtro" ${R.responde==='Otro'?'':'hidden'}>${inputTxt('respondeOtro','Especifique')}</div></div>
-      <div class="q"><div class="qt">¿Es su primera vez en CMGA?</div>${textOps('primeraVez',['Sí','No'])}</div>`;
-  } else if(p.area){
-    const a = p.area;
-    h = cab(a.ico+' '+a.titulo) + `<p class="sub">¿Cómo califica lo siguiente? Si no aplica a su caso, elija "No aplica".</p>`
-      + (a.skip?`<button class="skip" data-act="skip" data-a="${a.id}">${esc(a.skip)} → marcar todo "No aplica" y continuar</button>`:'')
-      + a.items.map(([k,t])=>rating(k,t)).join('');
-    if(a.id==='enf'||a.id==='uenf') h += `<div class="q"><div class="qt">¿Desea reconocer a alguna enfermera o enfermero? (opcional)</div>${inputTxt('reconocimientoEnf','Nombre')}</div>`;
-    if(a.id==='uegr') h += `<div class="q"><div class="qt">¿Cómo terminó su atención en Urgencias?</div>${textOps('destinoUrg',DESTINOS_URG)}</div>`;
-  } else if(p.id==='seg'){
-    h = cab('🛡️ Seguridad y trato digno') + `<p class="sub">Responda Sí o No según lo que recuerde.</p>`
-      + SEG.map(([k,t])=>`<div class="q" id="q_${k}"><div class="qt">${esc(esUrg(R.servicio)&&SEG_URG_TXT[k]?SEG_URG_TXT[k]:t)}</div><div class="opts">${['Sí','No','No recuerdo'].map(v=>opBtn(k,{v,t:v,c:'g'},'txt')).join('')}</div>${k==='s6'?`<div class="cond" id="c_incidenteDesc" ${R.s6==='Sí'?'':'hidden'}>${areaTxt('incidenteDesc','Descríbalo brevemente para poder atenderlo')}</div>`:''}</div>`).join('');
-  } else if(p.id==='global'){
-    const nps = [...Array(11).keys()].map(n=>{const c=n<=6?'lo':(n<=8?'mid':'hi');return `<button type="button" class="op ${c}${R.nps===String(n)?' sel':''}" data-k="nps" data-v="${n}">${n}</button>`;}).join('');
-    h = cab('⭐ Evaluación global')
-      + GLOBAL.map(([k,t])=>rating(k,t,false)).join('')
-      + `<div class="q"><div class="qt">Del 0 al 10, ¿qué tan probable es que recomiende CMGA a un familiar o amigo?</div><div class="nps">${nps}</div><div class="npsl"><span>0 = Nada probable</span><span>10 = Muy probable</span></div></div>
-      <div class="q"><div class="qt">${esUrg(R.servicio)?'Si necesitara atención de urgencias de nuevo':'Si necesitara atención hospitalaria de nuevo'}, ¿regresaría a CMGA?</div>${textOps('regresaria',['Sí','Tal vez','No'])}</div>
-      <div class="q"><div class="qt">¿Qué área o persona le gustaría reconocer y por qué? (opcional)</div>${areaTxt('reconocimiento','Escriba aquí')}</div>`;
-  } else if(p.id==='coment'){
-    h = cab('💬 Quejas y sugerencias')
-      + `<div class="q"><div class="qt">¿Tiene alguna queja o sugerencia? ¿Qué podemos mejorar?</div>${areaTxt('comentarios','Escriba aquí su queja o sugerencia (opcional)')}</div>
-      <div class="q"><div class="qt">¿Desea que nos comuniquemos con usted sobre su experiencia?</div>${textOps('contacto',['Sí','No'])}
-        <div class="cond" id="c_contacto" ${R.contacto==='Sí'?'':'hidden'}>
-          <div style="display:grid;gap:8px;margin-top:4px">${inputTxt('contactoNombre','Nombre')}${inputTxt('contactoTel','Teléfono','tel')}</div>
-          <div class="hint">Sus datos de contacto son opcionales y se tratarán conforme al Aviso de Privacidad de CMGA.</div>
-        </div></div>`;
-  } else if(p.id==='fin'){
-    h = `<div class="hero"><div class="check">✓</div><h1>¡Gracias por su opinión!</h1>
-      <p>Gracias por confiar su salud en nosotros. Le deseamos una pronta recuperación.</p>
-      <p class="hint" id="finFolio"></p>
-      <button class="btn pri" data-act="nueva">Nueva encuesta</button>
-      <p class="hint" id="finCuenta"></p></div>`;
+function obtenerRespuestasNaranjo(prefix){
+  const respuestas = [];
+  for(let i = 0; i < PREGUNTAS_NARANJO.length; i++){
+    const el = document.getElementById(prefix + i);
+    respuestas.push(el ? el.value : 'nosabe');
   }
-  w.innerHTML = h;
-  window.scrollTo(0,0);
+  return respuestas;
 }
 
-function actualizarCondicionales(){
-  const m = {respondeOtro:R.responde==='Otro', incidenteDesc:R.s6==='Sí', contacto:R.contacto==='Sí'};
-  Object.entries(m).forEach(([id,on])=>{const el=document.getElementById('c_'+id); if(el) el.hidden=!on;});
+function calcularNaranjoCliente(prefix){
+  const respuestas = obtenerRespuestasNaranjo(prefix);
+  let total = 0;
+  respuestas.forEach((r, i) => {
+    if(r === 'si') total += PUNTOS_NARANJO_CLIENTE[i][0];
+    else if(r === 'no') total += PUNTOS_NARANJO_CLIENTE[i][1];
+  });
+  let clasificacion;
+  if(total >= 9) clasificacion = 'Definitiva';
+  else if(total >= 5) clasificacion = 'Probable';
+  else if(total >= 1) clasificacion = 'Posible';
+  else clasificacion = 'Dudosa';
+
+  const elPuntaje = document.getElementById(prefix + 'puntaje');
+  const elClasif = document.getElementById(prefix + 'clasificacion');
+  if(elPuntaje) elPuntaje.textContent = total;
+  if(elClasif) elClasif.textContent = clasificacion + ' (vista previa)';
+  return { puntaje: total, clasificacion: clasificacion };
 }
 
-document.addEventListener('click',e=>{
-  const b = e.target.closest('#wizard .op');
-  if(b){
-    const k=b.dataset.k, v=b.dataset.v;
-    const urgAntes = esUrg(R.servicio);
-    if(R[k]===v){ delete R[k]; b.classList.remove('sel'); }   // tocar de nuevo = desmarcar
-    else{
-      R[k]=v;
-      b.parentElement.querySelectorAll('.op').forEach(x=>x.classList.toggle('sel',x===b));
-    }
-    actualizarCondicionales();
-    if(k==='servicio' && urgAntes!==esUrg(R.servicio)){   // cambian las preguntas: Urgencias ↔ hospitalización
-      delete R.estancia;
-      const y=window.scrollY; render(); window.scrollTo(0,y);
-    }
+/* ============================================================================
+   ACCESO DE SUPERVISIÓN (PIN)
+   ----------------------------------------------------------------------------
+   El registro de un evento nuevo (pestaña "Nuevo evento") NO requiere PIN:
+   cualquier persona puede abrir esta página — por ejemplo escaneando un
+   código QR — y reportar un evento directamente. El PIN solo se pide al
+   entrar a "Eventos" o "Indicadores", porque ahí se ven datos de pacientes
+   y el seguimiento de cada caso.
+   ============================================================================ */
+let vistaPendientePin = null; // vista a la que se entrará si el PIN es correcto
+
+function obtenerPin(){
+  return sessionStorage.getItem('ea_pin') || '';
+}
+function estaAutenticado(){
+  return obtenerPin() === PIN_ACCESO;
+}
+
+function abrirModalPin(vistaDestino){
+  vistaPendientePin = vistaDestino;
+  document.getElementById('inputPin').value = '';
+  document.getElementById('errorLogin').textContent = '';
+  document.getElementById('overlayPin').classList.add('activa');
+  document.getElementById('inputPin').focus();
+}
+function cerrarModalPin(){
+  document.getElementById('overlayPin').classList.remove('activa');
+  vistaPendientePin = null;
+}
+function confirmarPin(){
+  const pin = document.getElementById('inputPin').value.trim();
+  if(pin === PIN_ACCESO){
+    sessionStorage.setItem('ea_pin', pin);
+    const destino = vistaPendientePin;
+    cerrarModalPin();
+    actualizarBotonSesion();
+    if(destino) activarVista(destino);
+  } else {
+    document.getElementById('errorLogin').textContent = 'PIN incorrecto.';
+  }
+}
+document.getElementById('inputPin').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') confirmarPin();
+});
+
+function cerrarSesion(){
+  sessionStorage.removeItem('ea_pin');
+  actualizarBotonSesion();
+  mostrarVista('nuevo');
+}
+
+function botonSesionClick(){
+  if(estaAutenticado()){
+    cerrarSesion();
+  } else {
+    abrirModalPin(null);
+  }
+}
+
+function actualizarBotonSesion(){
+  const btn = document.getElementById('btnSesion');
+  if(estaAutenticado()){
+    btn.textContent = 'Cerrar sesión de supervisión';
+  } else {
+    btn.textContent = '🔒 Acceso de supervisión';
+  }
+}
+
+window.addEventListener('load', function(){
+  actualizarBotonSesion();
+});
+
+/* ============================================================================
+   NAVEGACIÓN DE PESTAÑAS
+   ============================================================================ */
+const VISTAS_PROTEGIDAS = ['eventos', 'indicadores'];
+
+function mostrarVista(nombre){
+  if(VISTAS_PROTEGIDAS.includes(nombre) && !estaAutenticado()){
+    abrirModalPin(nombre);
     return;
   }
-  const a = e.target.closest('[data-act]');
-  if(!a) return;
-  const act = a.dataset.act;
-  if(act==='comenzar'){ R={}; idCliente=nuevoId(); paso=1; render(); }
-  else if(act==='skip'){ const ar=TODAS_AREAS.find(x=>x.id===a.dataset.a); ar.items.forEach(([k])=>R[k]='NA'); siguiente(); }
-  else if(act==='nueva'){ reiniciar(); }
-});
-document.addEventListener('input',e=>{
-  const el = e.target;
-  if(el.matches('#wizard [data-k]')){ const v=el.value; if(v.trim()) R[el.dataset.k]=v; else delete R[el.dataset.k]; }
-});
-
-function siguiente(){
-  const p = pasos()[paso];
-  if(p.id==='datos' && !R.servicio){ toast('Por favor seleccione el servicio donde estuvo'); return; }
-  if(p.id==='datos' && !(R.habitacion||'').trim()){ toast(esUrg(R.servicio)?'Por favor escriba el cubículo o cama donde le atendieron':'Por favor escriba el número de habitación'); const i=document.querySelector('#wizard input[data-k="habitacion"]'); if(i) i.focus(); return; }
-  if(p.id==='coment'){ enviar(); return; }
-  paso++; render();
-}
-$('#btnSig').onclick = siguiente;
-$('#btnAtras').onclick = ()=>{ if(paso>1){paso--;render();} else reiniciar(); };
-
-function motivosAlerta(d){
-  const m=[];
-  Object.keys(d).forEach(k=>{ if(d[k]==='M' && ETIQ[k]) m.push('Malo — '+ETIQ[k]); });
-  ['s1','s2','s3','s4','s5'].forEach(k=>{ if(d[k]==='No') m.push('No — '+ETIQ[k]); });
-  if(d.s6==='Sí') m.push('Incidente no resuelto'+(d.incidenteDesc?': '+d.incidenteDesc:''));
-  return m;
+  activarVista(nombre);
 }
 
-async function enviar(){
-  const btn=$('#btnSig'); btn.disabled=true; btn.textContent='Enviando…';
-  const datos = Object.assign({},R);
-  if(datos.contacto!=='Sí'){ delete datos.contactoNombre; delete datos.contactoTel; }
-  if(datos.responde!=='Otro') delete datos.respondeOtro;
-  if(datos.s6!=='Sí') delete datos.incidenteDesc;
-  const validas = new Set(areasDe(datos.servicio).flatMap(a=>a.items.map(i=>i[0])));
-  TODAS_AREAS.forEach(a=>a.items.forEach(([k])=>{ if(!validas.has(k)) delete datos[k]; }));
-  if(!esUrg(datos.servicio)) delete datos.destinoUrg;
-  if(datos.estancia && !(esUrg(datos.servicio)?ESTANCIAS_URG:ESTANCIAS).includes(datos.estancia)) delete datos.estancia;
-  datos.motivosAlerta = motivosAlerta(datos).join(' | ');
-  datos.version = '2';
-  const payload = {action:'guardar', idCliente, datos};
-  let folio = null;
-  try{ const r = await api(payload); folio = r.folio; }
-  catch(err){
-    const pend = lsGet(LS_PEND,[]); pend.push(payload); lsSet(LS_PEND,pend); actualizarPend();
-  }
-  btn.disabled=false;
-  paso = pasos().length-1; render();
-  $('#finFolio').textContent = folio ? ('Folio: '+folio) : 'Su encuesta quedó guardada en este equipo y se enviará en cuanto haya conexión.';
-  let s = RESET_SEG;
-  const tick=()=>{ const el=$('#finCuenta'); if(!el) return; el.textContent='La pantalla se reiniciará en '+s+' s'; if(s--<=0) reiniciar(); else resetT=setTimeout(tick,1000); };
-  tick();
+function activarVista(nombre){
+  document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('activa'));
+  document.getElementById('vista-' + nombre).classList.add('activa');
+  document.getElementById('tabBtn-' + nombre).classList.add('activa');
+  if(nombre === 'eventos') cargarEventos();
+  if(nombre === 'indicadores') cargarIndicadores();
 }
-function reiniciar(){ clearTimeout(resetT); R={}; idCliente=null; paso=0; cerrarModal(); render(); }
 
-/* Cola sin conexión */
-function actualizarPend(){ const n=lsGet(LS_PEND,[]).length; $('#pendInfo').textContent = n? `⏳ ${n} encuesta(s) pendiente(s) de enviar ·`:''; }
-let enviando=false;
-async function flushPendientes(){
-  if(enviando) return; enviando=true;
-  try{
-    let pend = lsGet(LS_PEND,[]);
-    while(pend.length){
-      try{ await api(pend[0]); }catch(e){ break; }
-      pend.shift(); lsSet(LS_PEND,pend);
-    }
-  } finally { enviando=false; actualizarPend(); }
+/* ============================================================================
+   FORMULARIO — MOSTRAR/OCULTAR SEGÚN CLASIFICACIÓN
+   ============================================================================ */
+function cambioClasificacion(){
+  const valor = document.getElementById('f_Clasificacion').value;
+  document.getElementById('campoGrado').style.display = (valor === 'Evento Adverso') ? 'block' : 'none';
+  document.getElementById('bloque-ram').style.display = (valor === 'RAM') ? 'block' : 'none';
 }
-window.addEventListener('online',flushPendientes);
-setInterval(flushPendientes,60000);
 
-/* Inactividad a media encuesta (modo tablet) */
-let ultimoToque = Date.now(), inactT=null;
-['pointerdown','keydown','input'].forEach(ev=>document.addEventListener(ev,()=>{ultimoToque=Date.now();},true));
-setInterval(()=>{
-  const p=pasos()[paso];
-  if(!$('#vEncuesta').hidden && p.id!=='inicio' && p.id!=='fin' && $('#ov').hidden && Date.now()-ultimoToque > INACTIVIDAD_MIN*60000){
-    let s=30;
-    abrirModal(`<h3>¿Sigue contestando?</h3><p>La encuesta se reiniciará en <b id="inS">30</b> s por inactividad.</p><div class="mrow"><button class="btn pri" id="inSi">Sí, continuar</button></div>`);
-    $('#inSi').onclick=()=>{clearInterval(inactT);ultimoToque=Date.now();cerrarModal();};
-    inactT=setInterval(()=>{s--; const el=$('#inS'); if(el) el.textContent=s; if(s<=0){clearInterval(inactT);reiniciar();}},1000);
-  }
-},15000);
-
-/* ===================== MODAL ===================== */
-function abrirModal(h){ $('#mbox').innerHTML=h; $('#ov').hidden=false; }
-function cerrarModal(){ $('#ov').hidden=true; $('#mbox').innerHTML=''; }
-
-/* ===================== PANEL ===================== */
-let PIN = null, FILAS = [];
-$('#lnkPanel').onclick = e=>{
+/* ============================================================================
+   GUARDAR EVENTO
+   ============================================================================ */
+function guardarEvento(e){
   e.preventDefault();
-  abrirModal(`<h3>Acceso supervisión</h3><p class="hint">Ingrese el PIN del panel de resultados.</p><input type="password" id="pinIn" autocomplete="off"><div class="mrow"><button class="btn sec" id="pinNo">Cancelar</button><button class="btn nav" id="pinOk">Entrar</button></div>`);
-  const ok = async()=>{
-    const pin=$('#pinIn').value.trim(); if(!pin) return;
-    $('#pinOk').disabled=true; $('#pinOk').textContent='Verificando…';
-    try{ await api({action:'verificarPin',pin}); PIN=pin; cerrarModal(); abrirPanel(); }
-    catch(err){ toast(/PIN/i.test(err.message)?'PIN incorrecto':'Sin conexión con el servidor'); $('#pinOk').disabled=false; $('#pinOk').textContent='Entrar'; }
+
+  const subtipo = document.getElementById('f_Clasificacion').value;
+  // Internamente se sigue derivando TipoAlcance para reutilizar la lógica de
+  // farmacovigilancia (medicamento, seriedad/desenlace, Naranjo, filtros): RAM
+  // es Farmacovigilancia; Cuasifalla/Evento Adverso/Centinela son Seguridad
+  // del Paciente — aunque en el formulario ya no se pida por separado.
+  const alcance = (subtipo === 'RAM') ? 'Farmacovigilancia' : 'Seguridad del Paciente';
+  let grado = '';
+  if(subtipo === 'Evento Adverso'){
+    grado = document.getElementById('f_Grado').value;
+  }
+  if(subtipo === 'Evento Centinela'){
+    grado = '5';
+  }
+
+  const datos = {
+    Area: document.getElementById('f_Area').value,
+    Turno: document.getElementById('f_Turno').value,
+    FechaEvento: document.getElementById('f_FechaEvento').value,
+    HoraEvento: document.getElementById('f_HoraEvento').value,
+    FechaDeteccion: document.getElementById('f_FechaDeteccion').value,
+    MedicoTratante: document.getElementById('f_MedicoTratante').value,
+    RegistradoPor: document.getElementById('f_RegistradoPor').value,
+    PacienteRef: document.getElementById('f_PacienteRef').value,
+    TipoAlcance: alcance,
+    Subtipo: subtipo,
+    Grado: grado,
+    MedicamentoNombre: document.getElementById('f_MedicamentoNombre') ? document.getElementById('f_MedicamentoNombre').value : '',
+    MedicamentoDosis: document.getElementById('f_MedicamentoDosis') ? document.getElementById('f_MedicamentoDosis').value : '',
+    MedicamentoVia: document.getElementById('f_MedicamentoVia') ? document.getElementById('f_MedicamentoVia').value : '',
+    MedicamentoLote: document.getElementById('f_MedicamentoLote') ? document.getElementById('f_MedicamentoLote').value : '',
+    Seriedad: alcance === 'Farmacovigilancia' ? document.getElementById('f_Seriedad').value : '',
+    Desenlace: alcance === 'Farmacovigilancia' ? document.getElementById('f_Desenlace').value : '',
+    NaranjoRespuestas: alcance === 'Farmacovigilancia' ? obtenerRespuestasNaranjo('f_naranjo_') : null,
+    Descripcion: document.getElementById('f_Descripcion').value,
+    Consecuencia: document.getElementById('f_Consecuencia').value,
+    AccionesInmediatas: document.getElementById('f_AccionesInmediatas').value
   };
-  $('#pinOk').onclick=ok; $('#pinNo').onclick=cerrarModal;
-  $('#pinIn').addEventListener('keydown',ev=>{if(ev.key==='Enter')ok();});
-  setTimeout(()=>{const i=$('#pinIn'); if(i) i.focus();},50);
-};
-$('#btnSalir').onclick=()=>{ PIN=null; FILAS=[]; $('#vPanel').hidden=true; $('#vEncuesta').hidden=false; $('#subTop').textContent='Encuesta de satisfacción al egreso'; reiniciar(); };
 
-function abrirPanel(){
-  $('#vEncuesta').hidden=true; $('#navBtns').hidden=true; $('#vPanel').hidden=false;
-  $('#subTop').textContent='Panel de resultados · Encuesta de satisfacción';
-  const h=new Date();
-  if(!$('#fDesde').value) $('#fDesde').value = hoyStr(new Date(h.getFullYear(),h.getMonth(),1));
-  if(!$('#fHasta').value) $('#fHasta').value = hoyStr(h);
-  $('#fServ').innerHTML = '<option value="">Todos</option>'+SERVICIOS.map(s=>`<option>${esc(s)}</option>`).join('');
-  cargarPanel();
-}
-async function cargarPanel(){
-  $('#kpis').innerHTML='<div class="empty">Cargando…</div>';
-  try{ const r = await api({action:'listar',pin:PIN}); FILAS = r.filas||[]; renderPanel(); }
-  catch(err){ $('#kpis').innerHTML=`<div class="empty">No se pudieron cargar los resultados: ${esc(err.message)}</div>`; }
-}
-$('#btnRecargar').onclick=cargarPanel;
-['fDesde','fHasta','fServ'].forEach(id=>$('#'+id).addEventListener('change',()=>renderPanel()));
+  const boton = document.getElementById('btnGuardarEvento');
+  boton.disabled = true;
+  boton.textContent = 'Guardando…';
+  mostrarMensaje('', '');
 
-function filtradas(conFechas=true){
-  const d=$('#fDesde').value, h=$('#fHasta').value, s=$('#fServ').value;
-  return FILAS.filter(f=>(!s||f.servicio===s) && (!conFechas || ((!d||f.fecha>=d)&&(!h||f.fecha<=h))));
-}
-function contar(filas,keys){
-  const c={E:0,B:0,R:0,M:0,NA:0};
-  filas.forEach(f=>keys.forEach(k=>{const v=f[k]; if(c[v]!==undefined) c[v]++;}));
-  const val=c.E+c.B+c.R+c.M;
-  return {c,val,sat: val? (c.E+c.B)/val*100 : null, prom: val? (4*c.E+3*c.B+2*c.R+c.M)/val : null};
-}
-const pct = x => x==null ? '—' : (Math.round(x*10)/10).toFixed(1)+' %';
-const cls = x => x==null ? 'nt' : (x>=META?'ok':(x>=80?'warn':'bad'));
-const colorSat = x => x==null ? 'var(--na)' : (x>=META?'var(--e)':(x>=80?'var(--r)':'var(--m)'));
-const TODAS_KEYS = TODAS_AREAS.flatMap(a=>a.items.map(i=>i[0]));
+  llamarBackend('guardar', { datos: datos })
+    .then(resp => {
+      if(resp.ok){
+        mostrarMensaje('ok', '✓ Evento guardado con folio ' + resp.resultado.folio + '.');
+        document.getElementById('formEvento').reset();
+        document.getElementById('campoGrado').style.display = 'none';
+        document.getElementById('bloque-ram').style.display = 'none';
+        document.getElementById('f_FechaEvento').valueAsDate = new Date();
+        calcularNaranjoCliente('f_naranjo_');
+        if(estaAutenticado()) cargarEventos(); // refresca el listado solo si ya se entró como supervisor
+      } else {
+        mostrarMensaje('error', 'Error al guardar: ' + resp.error);
+      }
+    })
+    .catch(err => mostrarMensaje('error', 'Error de conexión: ' + err))
+    .finally(() => {
+      boton.disabled = false;
+      boton.textContent = 'Guardar evento';
+    });
 
-function stk(c){
-  const t=c.E+c.B+c.R+c.M; if(!t) return '<span class="tag nt">Sin respuestas</span>';
-  return `<div class="stk" title="E ${c.E} · B ${c.B} · R ${c.R} · M ${c.M}">${['E','B','R','M'].map(v=>c[v]?`<i style="width:${c[v]/t*100}%;background:var(--${v.toLowerCase()})"></i>`:'').join('')}</div>`;
+  return false;
 }
 
-function renderPanel(){
-  const F = filtradas();
-  // KPIs
-  const glob = contar(F,TODAS_KEYS), g1=contar(F,['g1']);
-  const npsV = F.map(f=>f.nps).filter(v=>v!==''&&v!=null).map(Number).filter(n=>!isNaN(n));
-  const nps = npsV.length ? (npsV.filter(n=>n>=9).length - npsV.filter(n=>n<=6).length)/npsV.length*100 : null;
-  const reg = F.filter(f=>f.regresaria); const regSi = reg.length? reg.filter(f=>f.regresaria==='Sí').length/reg.length*100 : null;
-  const alertasPend = F.filter(f=>f.alerta==='Sí' && f.estadoSeguimiento!=='Atendida').length;
-  $('#kpis').innerHTML = [
-    {l:'Encuestas',v:F.length,d:'en el periodo',c:''},
-    {l:'Satisfacción global',v:pct(glob.sat),d:glob.val+' respuestas válidas',c:cls(glob.sat)},
-    {l:'Calificación general',v:pct(g1.sat),d:'Excelente + Bueno (9.1)',c:cls(g1.sat)},
-    {l:'Índice de recomendación',v:nps==null?'—':Math.round(nps),d:npsV.length+' resp. · promotores − detractores',c:nps==null?'':(nps>=50?'ok':(nps>=0?'warn':'bad'))},
-    {l:'Regresaría a CMGA',v:pct(regSi),d:reg.length+' respuestas',c:cls(regSi)},
-    {l:'Alertas pendientes',v:alertasPend,d:'sin marcar como atendidas',c:alertasPend?'bad':'ok'}
-  ].map(k=>`<div class="kpi ${k.c}"><div class="l">${k.l}</div><div class="v">${k.v}</div><div class="d">${k.d}</div></div>`).join('');
+function mostrarMensaje(tipo, texto){
+  const el = document.getElementById('msgGuardado');
+  el.textContent = texto;
+  el.className = tipo;
+}
 
-  // Áreas
-  const leg = `<div class="legend"><span style="--c:var(--e)">Excelente</span><span style="--c:var(--b)">Bueno</span><span style="--c:var(--r)">Regular</span><span style="--c:var(--m)">Malo</span></div>`;
-  const filaArea = a=>{
-    const s = contar(F,a.items.map(i=>i[0]));
-    const det = a.items.map(([k,t])=>{const si=contar(F,[k]);return `<tr><td>${esc(t)}</td><td style="width:40%">${stk(si.c)}</td><td><span class="tag ${cls(si.sat)}">${pct(si.sat)}</span></td><td>${si.c.NA||0}</td></tr>`;}).join('');
-    return `<details class="area"><summary class="arow">
-        <span class="nm">${a.ico} ${esc(a.titulo)}</span>
-        <span class="bc"><div class="barw"><i style="width:${s.sat||0}%;background:${colorSat(s.sat)}"></i></div></span>
-        <span><span class="tag ${cls(s.sat)}">${pct(s.sat)}</span></span>
-        <span>${s.prom==null?'—':s.prom.toFixed(2)} / 4</span>
-        <span class="nn">${s.val} resp.</span></summary>
-        <div style="padding:0 6px 10px">${leg}<table><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>N/A</th></tr>${det}</table></div></details>`;
-  };
-  const fs = $('#fServ').value;
-  const verHosp = !esUrg(fs), verUrg = !fs || esUrg(fs);
-  const nHosp = F.filter(f=>!esUrg(f.servicio)).length, FU = F.filter(f=>esUrg(f.servicio));
-  const dest = DESTINOS_URG.map(d=>`${d}: <b>${FU.filter(f=>f.destinoUrg===d).length}</b>`).join(' · ');
-  const cabG = (t,n,extra='') => `<div class="grp"><b>${t}</b> <span>${n} encuesta(s)</span>${extra?`<div class="hint" style="margin-top:4px">${extra}</div>`:''}</div>`;
-  $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>Puntaje</span><span class="nn">n</span></div>`
-    + (verHosp ? (fs?'':cabG('🏥 Hospitalización, Terapias e Imagen',nHosp)) + AREAS.map(filaArea).join('') : '')
-    + (verUrg ? cabG('🚑 Urgencias',FU.length,FU.length?'Cómo terminó la atención — '+dest:'') + AREAS_URG.map(filaArea).join('') : '');
+/* ============================================================================
+   COMUNICACIÓN CON EL BACKEND
+   ============================================================================ */
+function llamarBackend(action, extra){
+  const body = Object.assign({ action: action, pin: PIN_ACCESO }, extra || {});
+  return fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS en Apps Script
+    body: JSON.stringify(body)
+  }).then(r => r.json());
+}
 
-  // Seguridad
-  $('#tblSeg').innerHTML = `<table><tr><th>Pregunta</th><th>Sí</th><th>n</th></tr>`+SEG.map(([k,t])=>{
-    const r=F.filter(f=>f[k]==='Sí'||f[k]==='No'); const si=r.filter(f=>f[k]==='Sí').length; const p=r.length?si/r.length*100:null;
-    const c = p==null?'nt':(k==='s6'?(p===0?'ok':'bad'):cls(p));
-    return `<tr><td>${esc(t)}</td><td><span class="tag ${c}">${pct(p)}</span></td><td>${r.length}</td></tr>`;}).join('')+'</table>';
+function mostrarError(idDiv, texto){
+  const el = document.getElementById(idDiv);
+  if(!el) return;
+  if(texto){
+    el.textContent = '⚠ ' + texto;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+}
 
-  // Tendencia
-  const base = filtradas(false), meses=[]; const hoy=new Date();
-  for(let i=11;i>=0;i--){const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1); meses.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));}
-  const NOM=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const datosT = meses.map(m=>{const fm=base.filter(f=>(f.fecha||'').slice(0,7)===m); return {m,n:fm.length,sat:contar(fm,TODAS_KEYS).sat};});
-  const W=560,H=200,pl=34,pb=26,bw=(W-pl)/12;
-  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Satisfacción mensual">`;
-  [60,70,80,90,100].forEach(y=>{const yy=(H-pb)-(y-50)/50*(H-pb-10); svg+=`<line x1="${pl}" x2="${W}" y1="${yy}" y2="${yy}" stroke="${y===META?'#1A8A6F':'#e3e8ee'}" ${y===META?'stroke-dasharray="4 3"':''}/><text x="${pl-4}" y="${yy+4}" font-size="10" text-anchor="end" fill="#5f6b7a">${y}</text>`;});
-  datosT.forEach((d,i)=>{
-    const x=pl+i*bw+bw*0.18, w=bw*0.64, lab=NOM[Number(d.m.slice(5))-1];
-    if(d.sat!=null){const v=Math.max(50,d.sat), hh=(v-50)/50*(H-pb-10); svg+=`<rect x="${x}" y="${(H-pb)-hh}" width="${w}" height="${hh}" rx="3" fill="${colorSat(d.sat)}"><title>${lab}: ${pct(d.sat)} · ${d.n} encuestas</title></rect><text x="${x+w/2}" y="${(H-pb)-hh-4}" font-size="9.5" text-anchor="middle" fill="#1d2733">${Math.round(d.sat)}</text>`;}
-    svg+=`<text x="${x+w/2}" y="${H-10}" font-size="10" text-anchor="middle" fill="#5f6b7a">${lab}</text>`;
+function cargarEventos(){
+  mostrarError('errorEventos', '');
+  fetch(APPS_SCRIPT_URL + '?action=list&pin=' + encodeURIComponent(obtenerPin()) + '&t=' + Date.now())
+    .then(r => r.json())
+    .then(resp => {
+      if(resp.ok){
+        eventosCache = resp.eventos;
+        try{ localStorage.setItem(LS_KEY, JSON.stringify(eventosCache)); }catch(e){}
+        renderTabla();
+      } else if(resp.error === 'PIN inválido'){
+        cerrarSesion();
+        abrirModalPin('eventos');
+      } else {
+        mostrarError('errorEventos', 'No se pudieron cargar los eventos: ' + (resp.error || 'error desconocido del servidor.'));
+      }
+    })
+    .catch(err => {
+      // sin conexión: usar última copia local si existe
+      try{
+        const local = localStorage.getItem(LS_KEY);
+        if(local){
+          eventosCache = JSON.parse(local);
+          renderTabla();
+          mostrarError('errorEventos', 'Sin conexión — mostrando la última copia guardada en este dispositivo.');
+        } else {
+          mostrarError('errorEventos', 'No se pudo conectar con el servidor: ' + err);
+        }
+      }catch(e){
+        mostrarError('errorEventos', 'No se pudo conectar con el servidor: ' + err);
+      }
+    });
+}
+
+function cargarIndicadores(){
+  mostrarError('errorIndicadores', '');
+  fetch(APPS_SCRIPT_URL + '?action=indicadores&pin=' + encodeURIComponent(obtenerPin()) + '&t=' + Date.now())
+    .then(r => r.json())
+    .then(resp => {
+      if(resp.ok){
+        renderIndicadores(resp.indicadores);
+      } else if(resp.error === 'PIN inválido'){
+        cerrarSesion();
+        abrirModalPin('indicadores');
+      } else {
+        mostrarError('errorIndicadores', 'No se pudieron cargar los indicadores: ' + (resp.error || 'error desconocido del servidor.'));
+      }
+    })
+    .catch(err => mostrarError('errorIndicadores', 'No se pudo conectar con el servidor: ' + err));
+}
+
+/* ============================================================================
+   TABLA DE EVENTOS
+   ============================================================================ */
+function limpiarFolio(v){ return String(v || '').replace(/^'/, ''); }
+
+function quitarAcentos(s){
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+function claseBadgeEstado(estado){
+  return 'b-' + quitarAcentos(estado).replace(/ /g, '-');
+}
+function esCentinelaEvento(ev){
+  return ev.EsCentinela === true || ev.EsCentinela === 'TRUE' || ev.EsCentinela === 'true';
+}
+
+function renderTabla(){
+  const busqueda = document.getElementById('filtroBusqueda').value.toLowerCase();
+  const estado = document.getElementById('filtroEstado').value;
+  const tipo = document.getElementById('filtroTipo').value;
+
+  const filtrados = eventosCache.filter(ev => {
+    if(estado && ev.Estado !== estado) return false;
+    if(tipo && ev.TipoAlcance !== tipo) return false;
+    if(busqueda){
+      const texto = (limpiarFolio(ev.Folio) + ' ' + ev.Area + ' ' + ev.Descripcion).toLowerCase();
+      if(texto.indexOf(busqueda) === -1) return false;
+    }
+    return true;
   });
-  svg+='</svg>';
-  $('#tendencia').innerHTML = datosT.some(d=>d.n)? svg+'<div class="hint">Eje vertical desde 50 %. Línea punteada = meta 90 %.</div>' : '<div class="empty">Aún no hay encuestas.</div>';
 
-  // Alertas
-  const al = F.filter(f=>f.alerta==='Sí').sort((a,b)=>{const pa=a.estadoSeguimiento==='Atendida'?1:0,pb2=b.estadoSeguimiento==='Atendida'?1:0; return pa-pb2 || (b.fechaHora||'').localeCompare(a.fechaHora||'');});
-  $('#alertas').innerHTML = al.length ? al.map(f=>{
-    const est=f.estadoSeguimiento||'Pendiente', c=est==='Atendida'?'at':(est==='En seguimiento'?'sg':'');
-    const contacto = f.contacto==='Sí' ? `<div class="hint">Contacto: ${esc(f.contactoNombre||'')} ${esc(f.contactoTel||'')}</div>`:'';
-    return `<div class="alert ${c}" data-folio="${esc(f.folio)}">
-      <div class="h"><b>${esc(f.folio)} · ${esc(f.servicio||'')}${f.habitacion?(esUrg(f.servicio)?' · Cubículo ':' · Hab. ')+esc(f.habitacion):''}</b><span class="hint">${esc(f.fechaHora||f.fecha||'')}</span></div>
-      <div class="mot">${esc(f.motivosAlerta||'Revisar respuestas').split(' | ').map(x=>'• '+x).join('<br>')}</div>
-      ${f.comentarios?`<div class="hint">Comentario: “${esc(f.comentarios)}”</div>`:''}${contacto}
-      <div class="seg" style="margin-top:8px">
-        <select>${['Pendiente','En seguimiento','Atendida'].map(o=>`<option ${o===est?'selected':''}>${o}</option>`).join('')}</select>
-        <input type="text" placeholder="Nota de seguimiento (acción tomada, responsable)" value="${esc(f.notaSeguimiento||'')}" maxlength="500">
-        <button class="btn nav sm" data-seg>Guardar</button>
-      </div>${f.fechaSeguimiento?`<div class="hint">Última actualización: ${esc(f.fechaSeguimiento)}</div>`:''}
-    </div>`;}).join('') : '<div class="empty">Sin alertas en el periodo. 👍</div>';
+  const cuerpo = document.getElementById('cuerpoTabla');
+  cuerpo.innerHTML = '';
+  document.getElementById('tablaVacia').style.display = filtrados.length ? 'none' : 'block';
 
-  // Comentarios / reconocimientos
-  const origen = f => {
-    const quien = f.responde==='Otro' ? (f.respondeOtro||'Otro') : (f.responde||'');
-    const lug = esUrg(f.servicio)?'Cubículo':'Hab.';
-    const lin1 = [f.habitacion?`<b>${lug} ${esc(f.habitacion)}</b>`:`<b>${lug} no indicado</b>`, esc(f.servicio||''), esc(f.fechaHora||f.fecha||'')].filter(Boolean).join(' · ');
-    const nombre = f.contactoNombre ? `${quien?esc(quien)+': ':''}<b>${esc(f.contactoNombre)}</b>${f.contactoTel?' · Tel. '+esc(f.contactoTel):''}` : (quien?`Respondió: ${esc(quien)} (sin nombre)`:'');
-    return `<div class="orig">${lin1}${nombre?`<br>${nombre}`:''}<br><span>Folio ${esc(f.folio)}</span></div>`;
-  };
-  const com = F.filter(f=>f.comentarios||f.incidenteDesc).sort((a,b)=>(b.fechaHora||'').localeCompare(a.fechaHora||''));
-  $('#comentarios').innerHTML = com.length? com.map(f=>`<div class="com">${f.comentarios?`<div>${esc(f.comentarios)}</div>`:''}${f.incidenteDesc?`<div><b>Incidente:</b> ${esc(f.incidenteDesc)}</div>`:''}${origen(f)}</div>`).join('') : '<div class="empty">Sin quejas ni sugerencias en el periodo.</div>';
-  const rec = F.filter(f=>f.reconocimiento||f.reconocimientoEnf).sort((a,b)=>(b.fechaHora||'').localeCompare(a.fechaHora||''));
-  $('#reconoc').innerHTML = rec.length? rec.map(f=>`<div class="com">${f.reconocimientoEnf?`<div><b>Enfermería:</b> ${esc(f.reconocimientoEnf)}</div>`:''}${f.reconocimiento?`<div>${esc(f.reconocimiento)}</div>`:''}${origen(f)}</div>`).join('') : '<div class="empty">Sin reconocimientos en el periodo.</div>';
+  filtrados.forEach(ev => {
+    const tr = document.createElement('tr');
+    tr.onclick = () => abrirModal(limpiarFolio(ev.Folio));
+    const claseEstado = claseBadgeEstado(ev.Estado);
+    const esCentinela = esCentinelaEvento(ev);
+    let gradoHtml = '';
+    if(esCentinela){
+      gradoHtml = '<span class="badge b-centinela">CENTINELA</span>';
+    } else if(ev.Grado){
+      gradoHtml = '<span class="badge b-grado' + ev.Grado + '">Grado ' + ev.Grado + '</span>';
+    } else {
+      gradoHtml = '—';
+    }
+    const claseTipo = ev.TipoAlcance === 'Farmacovigilancia' ? 'b-farmaco' : 'b-seguridad';
+    tr.innerHTML =
+      '<td><b>' + limpiarFolio(ev.Folio) + '</b></td>' +
+      '<td>' + limpiarFolio(ev.FechaEvento) + '</td>' +
+      '<td>' + (ev.Area || '') + '</td>' +
+      '<td><span class="badge ' + claseTipo + '">' + (ev.Subtipo || ev.TipoAlcance) + '</span></td>' +
+      '<td>' + gradoHtml + '</td>' +
+      '<td><span class="badge ' + claseEstado + '">' + ev.Estado + '</span></td>';
+    cuerpo.appendChild(tr);
+  });
 }
 
-$('#alertas').addEventListener('click',async e=>{
-  const b=e.target.closest('[data-seg]'); if(!b) return;
-  const card=b.closest('.alert'), folio=card.dataset.folio;
-  const estado=card.querySelector('select').value, nota=card.querySelector('input').value.trim();
-  b.disabled=true; b.textContent='Guardando…';
-  try{
-    const r = await api({action:'seguimiento',pin:PIN,folio,estado,nota});
-    const f=FILAS.find(x=>x.folio===folio); if(f){f.estadoSeguimiento=estado;f.notaSeguimiento=nota;f.fechaSeguimiento=r.fechaSeguimiento||'';}
-    toast('Seguimiento guardado'); renderPanel();
-  }catch(err){ toast('No se guardó: '+err.message); b.disabled=false; b.textContent='Guardar'; }
-});
+/* ============================================================================
+   MODAL DE DETALLE / FLUJO DE ESTADO / ACR / PLAN DE ACCIÓN / CIERRE
+   ============================================================================ */
+const ESTADOS = ['Registrado', 'En análisis', 'Con plan de acción', 'Cerrado'];
 
-$('#btnCSV').onclick=()=>{
-  const F=filtradas(); if(!F.length){toast('No hay encuestas en el periodo');return;}
-  const cols=[]; F.forEach(f=>Object.keys(f).forEach(k=>{if(!cols.includes(k))cols.push(k);}));
-  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const csv='\ufeff'+cols.map(q).join(',')+'\n'+F.map(f=>cols.map(c=>q(f[c])).join(',')).join('\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download=`encuestas_satisfaccion_${$('#fDesde').value}_a_${$('#fHasta').value}.csv`; a.click();
-};
+function abrirModal(folio){
+  const ev = eventosCache.find(e => limpiarFolio(e.Folio) === folio);
+  if(!ev) return;
+  folioAbierto = folio;
+  document.getElementById('modalFolio').textContent = 'Folio ' + folio;
+  document.getElementById('modalContenido').innerHTML = construirDetalle(ev);
+  document.getElementById('overlayDetalle').classList.add('activa');
+}
 
-$('#btnQR').onclick=()=>{
-  const url = location.href.split('#')[0].split('?')[0];
-  abrirModal(`<h3>Código QR de la encuesta</h3><p class="hint">Imprímalo para colocarlo en habitaciones o en Cajas. Lleva directo a la encuesta.</p><div class="qrbox" id="qrM"></div><div class="hint" style="word-break:break-all;text-align:center">${esc(url)}</div><div class="mrow"><button class="btn sec" id="qrNo">Cerrar</button><button class="btn nav" id="qrPrint">Imprimir tarjeta</button></div>`);
-  if(window.QRCode){ new QRCode($('#qrM'),{text:url,width:220,height:220,correctLevel:QRCode.CorrectLevel.M}); }
-  else $('#qrM').innerHTML='<div class="empty">No se pudo cargar el generador de QR (revise la conexión).</div>';
-  $('#qrNo').onclick=cerrarModal;
-  $('#qrPrint').onclick=()=>{
-    $('#printWrap').innerHTML=`<div class="pcard"><img src="${LOGO_SRC}" alt="CMGA" style="width:300px;max-width:100%"><h1>¿Cómo fue su atención?</h1><p>Su opinión nos ayuda a mejorar.</p><p>Escanee el código con la cámara de su celular.</p><div class="pq" id="qrP"></div><p class="pf">Encuesta anónima · 3 minutos</p></div>`;
-    new QRCode(document.getElementById('qrP'),{text:url,width:260,height:260,correctLevel:QRCode.CorrectLevel.M});
-    setTimeout(()=>window.print(),300);
+function cerrarModal(){
+  document.getElementById('overlayDetalle').classList.remove('activa');
+  folioAbierto = null;
+}
+
+function construirDetalle(ev){
+  const esCentinela = esCentinelaEvento(ev);
+  const grado = parseInt(ev.Grado, 10) || 0;
+  const estadoActual = ev.Estado;
+  // El análisis de causa raíz solo aplica a eventos centinela o de grado >= 3,
+  // y se habilita a partir de que el evento entra a un estado de análisis
+  // (no desde el momento del registro inicial).
+  const requiereACR = (esCentinela || grado >= 3) && estadoActual !== 'Registrado';
+
+  let html = '';
+  html += filaDetalle('Área / Servicio', ev.Area);
+  html += filaDetalle('Turno', ev.Turno || '—');
+  html += filaDetalle('Fecha y hora del evento', limpiarFolio(ev.FechaEvento) + ' ' + (ev.HoraEvento || ''));
+  html += filaDetalle('Fecha de detección', ev.FechaDeteccion ? limpiarFolio(ev.FechaDeteccion) : '—');
+  html += filaDetalle('Médico tratante / personal involucrado', ev.MedicoTratante || '—');
+  html += filaDetalle('Registrado por', ev.RegistradoPor);
+  html += filaDetalle('Paciente', ev.PacienteRef || '—');
+  html += filaDetalle('Clasificación', ev.TipoAlcance + ' — ' + ev.Subtipo);
+  if(ev.TipoAlcance === 'Farmacovigilancia'){
+    html += filaDetalle('Medicamento', [ev.MedicamentoNombre, ev.MedicamentoDosis, ev.MedicamentoVia, ev.MedicamentoLote].filter(Boolean).join(' · ') || '—');
+  }
+  html += filaDetalle('Descripción', ev.Descripcion);
+  html += filaDetalle('Consecuencia / daño', ev.Consecuencia || '—');
+  html += filaDetalle('Acciones inmediatas', ev.AccionesInmediatas || '—');
+
+  // Evaluación de farmacovigilancia (seriedad, desenlace, causalidad de Naranjo)
+  if(ev.TipoAlcance === 'Farmacovigilancia'){
+    let respuestasPrevias = null;
+    try{ respuestasPrevias = JSON.parse(ev.NaranjoRespuestas || 'null'); }catch(err){ respuestasPrevias = null; }
+
+    html += '<div class="seccion-titulo">Evaluación de farmacovigilancia</div>';
+    html += '<div class="grid2">';
+    html += '<div class="campo"><label>Seriedad</label><select id="m_Seriedad">' +
+      '<option value="No seria"' + (ev.Seriedad !== 'Seria' ? ' selected' : '') + '>No seria</option>' +
+      '<option value="Seria"' + (ev.Seriedad === 'Seria' ? ' selected' : '') + '>Seria</option>' +
+      '</select></div>';
+    const desenlaceActual = ev.Desenlace || 'Desconocido';
+    html += '<div class="campo"><label>Desenlace</label><select id="m_Desenlace">' +
+      ['Desconocido', 'Recuperado', 'Recuperado con secuelas', 'No recuperado', 'Fallecido'].map(op =>
+        '<option value="' + op + '"' + (desenlaceActual === op ? ' selected' : '') + '>' + op + '</option>'
+      ).join('') +
+      '</select></div>';
+    html += '</div>';
+    html += '<div class="seccion-titulo" style="margin-top:10px;">Algoritmo de Naranjo (causalidad)</div>';
+    html += generarBloqueNaranjo('m_naranjo_', respuestasPrevias);
+    html += '<div class="kpi" style="max-width:260px;margin:10px 0;">' +
+      '<div class="valor" id="m_naranjo_puntaje">' + (ev.NaranjoPuntaje !== undefined && ev.NaranjoPuntaje !== '' ? ev.NaranjoPuntaje : '—') + '</div>' +
+      '<div class="etiqueta" id="m_naranjo_clasificacion">' + (ev.NaranjoClasificacion || 'Sin evaluar') + '</div></div>';
+    html += '<button class="secundario" onclick="guardarFarmacovigilancia()">Guardar evaluación de farmacovigilancia</button>';
+  }
+
+  // Flujo de estados
+  html += '<div class="seccion-titulo">Estado del evento</div>';
+  html += '<div class="flujoEstados">';
+  ESTADOS.forEach(est => {
+    const activo = est === estadoActual ? 'actual' : '';
+    html += '<button class="' + activo + '" onclick="cambiarEstado(\'' + est.replace(/'/g, "\\'") + '\')">' + est + '</button>';
+  });
+  html += '</div>';
+
+  // Análisis de causa raíz (solo si centinela o grado >= 3)
+  if(requiereACR){
+    html += '<div class="seccion-titulo">Análisis de causa raíz (ligero)</div>';
+    html += '<div class="campo"><label>Causa inmediata</label><textarea id="m_CausaInmediata">' + esc(ev.CausaInmediata) + '</textarea></div>';
+    html += '<div class="campo"><label>Factores contribuyentes</label><textarea id="m_FactoresContribuyentes" placeholder="Comunicación, capacitación, carga de trabajo, insumos/equipo, proceso/protocolo, otro">' + esc(ev.FactoresContribuyentes) + '</textarea></div>';
+    html += '<div class="campo"><label>Causa raíz</label><textarea id="m_CausaRaiz">' + esc(ev.CausaRaiz) + '</textarea></div>';
+    html += '<div class="campo"><label>Recomendaciones</label><textarea id="m_Recomendaciones">' + esc(ev.Recomendaciones) + '</textarea></div>';
+    html += '<button class="secundario" onclick="guardarAnalisis()">Guardar análisis</button>';
+  } else if (esCentinela || grado >= 3) {
+    html += '<div class="seccion-titulo">Análisis de causa raíz</div>';
+    html += '<div class="vacio" style="padding:12px;">Cambia el estado a "En análisis" para habilitar el análisis de causa raíz.</div>';
+  }
+
+  // Plan de acción
+  html += '<div class="seccion-titulo">Plan de acción</div>';
+  html += '<div class="campo"><label>Descripción del plan</label><textarea id="m_PlanDescripcion">' + esc(ev.PlanAccionDescripcion) + '</textarea></div>';
+  html += '<div class="grid2">';
+  html += '<div class="campo"><label>Responsable</label><input type="text" id="m_PlanResponsable" value="' + esc(ev.PlanAccionResponsable) + '"></div>';
+  html += '<div class="campo"><label>Fecha compromiso</label><input type="date" id="m_PlanFecha" value="' + limpiarFolio(ev.PlanAccionFechaCompromiso) + '"></div>';
+  html += '</div>';
+  html += '<button class="secundario" onclick="guardarPlan()">Guardar plan de acción</button>';
+
+  // Cierre
+  if(estadoActual !== 'Cerrado'){
+    html += '<div class="seccion-titulo">Cerrar evento</div>';
+    html += '<div class="grid2">';
+    html += '<div class="campo"><label>Cerrado por</label><input type="text" id="m_CerradoPor" placeholder="Nombre"></div>';
+    html += '<div class="campo"><label>Fecha de cierre</label><input type="date" id="m_FechaCierre" value="' + new Date().toISOString().slice(0,10) + '"></div>';
+    html += '</div>';
+    html += '<button class="primario" onclick="cerrarEventoModal()">Cerrar evento</button>';
+  } else {
+    html += filaDetalle('Cerrado por', ev.CerradoPor);
+    html += filaDetalle('Fecha de cierre', limpiarFolio(ev.FechaCierre));
+  }
+
+  return html;
+}
+
+function filaDetalle(etiqueta, valor){
+  return '<div class="detalle-fila"><b>' + etiqueta + ':</b><span>' + esc(valor || '—') + '</span></div>';
+}
+function esc(v){
+  return String(v === undefined || v === null ? '' : v).replace(/^'/, '').replace(/</g,'&lt;');
+}
+
+function cambiarEstado(nuevoEstado){
+  if(!folioAbierto) return;
+  llamarBackend('actualizarEstado', { folio: folioAbierto, nuevoEstado: nuevoEstado })
+    .then(resp => {
+      if(resp.ok){ cargarEventosYReabrir(); }
+      else alert('Error: ' + resp.error);
+    });
+}
+
+function guardarAnalisis(){
+  if(!folioAbierto) return;
+  const datos = {
+    CausaInmediata: document.getElementById('m_CausaInmediata').value,
+    FactoresContribuyentes: document.getElementById('m_FactoresContribuyentes').value,
+    CausaRaiz: document.getElementById('m_CausaRaiz').value,
+    Recomendaciones: document.getElementById('m_Recomendaciones').value
   };
+  llamarBackend('guardarAnalisis', { folio: folioAbierto, datos: datos })
+    .then(resp => { if(resp.ok){ cargarEventosYReabrir(); } else alert('Error: ' + resp.error); });
+}
+
+function guardarFarmacovigilancia(){
+  if(!folioAbierto) return;
+  const datos = {
+    Seriedad: document.getElementById('m_Seriedad').value,
+    Desenlace: document.getElementById('m_Desenlace').value,
+    NaranjoRespuestas: obtenerRespuestasNaranjo('m_naranjo_')
+  };
+  llamarBackend('guardarFarmacovigilancia', { folio: folioAbierto, datos: datos })
+    .then(resp => { if(resp.ok){ cargarEventosYReabrir(); } else alert('Error: ' + resp.error); });
+}
+
+function guardarPlan(){
+  if(!folioAbierto) return;
+  const datos = {
+    PlanAccionDescripcion: document.getElementById('m_PlanDescripcion').value,
+    PlanAccionResponsable: document.getElementById('m_PlanResponsable').value,
+    PlanAccionFechaCompromiso: document.getElementById('m_PlanFecha').value
+  };
+  llamarBackend('guardarPlanAccion', { folio: folioAbierto, datos: datos })
+    .then(resp => { if(resp.ok){ cargarEventosYReabrir(); } else alert('Error: ' + resp.error); });
+}
+
+function cerrarEventoModal(){
+  if(!folioAbierto) return;
+  const datos = {
+    CerradoPor: document.getElementById('m_CerradoPor').value,
+    FechaCierre: document.getElementById('m_FechaCierre').value
+  };
+  if(!datos.CerradoPor){ alert('Indica quién cierra el evento.'); return; }
+  llamarBackend('cerrarEvento', { folio: folioAbierto, datos: datos })
+    .then(resp => { if(resp.ok){ cargarEventosYReabrir(); } else alert('Error: ' + resp.error); });
+}
+
+function cargarEventosYReabrir(){
+  const folio = folioAbierto;
+  fetch(APPS_SCRIPT_URL + '?action=list&pin=' + encodeURIComponent(obtenerPin()) + '&t=' + Date.now())
+    .then(r => r.json())
+    .then(resp => {
+      if(resp.ok){
+        eventosCache = resp.eventos;
+        try{ localStorage.setItem(LS_KEY, JSON.stringify(eventosCache)); }catch(e){}
+        renderTabla();
+        if(folio) abrirModal(folio);
+      }
+    });
+}
+
+/* ============================================================================
+   INDICADORES
+   ============================================================================ */
+function renderIndicadores(ind){
+  const kpis = document.getElementById('kpisPrincipales');
+  kpis.innerHTML =
+    kpi(ind.totalEventos, 'Total histórico') +
+    kpi(ind.totalMesActual, 'Eventos este mes') +
+    kpi(ind.centinelaMesActual, 'Centinela este mes') +
+    kpi(ind.porcentajeCerrados + '%', 'Cerrados') +
+    kpi(ind.tiempoPromedioCierreDias !== null ? ind.tiempoPromedioCierreDias + ' d' : '—', 'Tiempo promedio de cierre');
+
+  const maxGrado = Math.max(1, ...Object.values(ind.porGrado));
+  document.getElementById('barrasGrado').innerHTML = Object.keys(ind.porGrado).map(g =>
+    barra('Grado ' + g, ind.porGrado[g], maxGrado)
+  ).join('');
+
+  const maxArea = ind.topAreas.length ? Math.max(...ind.topAreas.map(a => a.total)) : 1;
+  document.getElementById('barrasAreas').innerHTML = ind.topAreas.length
+    ? ind.topAreas.map(a => barra(a.area, a.total, maxArea)).join('')
+    : '<div class="vacio">Sin datos suficientes.</div>';
+}
+
+function kpi(valor, etiqueta){
+  return '<div class="kpi"><div class="valor">' + valor + '</div><div class="etiqueta">' + etiqueta + '</div></div>';
+}
+function barra(nombre, valor, max){
+  const pct = max ? Math.round((valor / max) * 100) : 0;
+  return '<div class="barra-fila"><div class="nombre">' + nombre + '</div><div class="barra-fondo"><div class="barra-relleno" style="width:' + pct + '%"></div></div><div class="num">' + valor + '</div></div>';
+}
+
+/* Marcar fecha por defecto al abrir Nuevo evento */
+document.getElementById('f_FechaEvento').valueAsDate = new Date();
+
+/* Construir el cuestionario de Naranjo del formulario de Nuevo evento */
+document.getElementById('bloqueNaranjoForm').innerHTML = generarBloqueNaranjo('f_naranjo_', null);
+
+/* ============================================================================
+   PRECARGA DESDE OTRAS APPS (botón "Reportar evento adverso" en Censo
+   Hospitalario / Censo Urgencias / Programación Quirúrgica).
+   Esas apps enlazan aquí con parámetros en la URL, por ejemplo:
+   ?origen=urgencias&area=Urgencias&paciente=Juan%20Perez%20-%20Cama%204&fecha=2026-11-12&turno=Matutino&medico=Dra.%20Lopez
+   ============================================================================ */
+const ORIGENES = {
+  'hospitalario': 'Censo Hospitalario',
+  'urgencias': 'Censo de Urgencias',
+  'quirurgica': 'Programación Quirúrgica'
 };
 
-/* ===================== INICIO ===================== */
-render(); actualizarPend(); flushPendientes();
+function buscarOpcion(select, valor){
+  if(!valor) return null;
+  const objetivo = quitarAcentos(valor).toLowerCase().trim();
+  for(const opt of select.options){
+    if(quitarAcentos(opt.value || opt.textContent).toLowerCase().trim() === objetivo) return opt.value;
+  }
+  return null;
+}
+
+function precargarDesdeURL(){
+  const params = new URLSearchParams(window.location.search);
+  const origenParam = params.get('origen') || '';
+  const areaParam = params.get('area') || '';
+  const pacienteParam = params.get('paciente') || '';
+  const fechaParam = params.get('fecha') || '';
+  const turnoParam = params.get('turno') || '';
+  const medicoParam = params.get('medico') || '';
+  const notaParam = params.get('nota') || '';
+
+  const hayDatos = areaParam || pacienteParam || fechaParam || turnoParam || medicoParam || notaParam;
+  if(!hayDatos) return;
+
+  const notasSinMapear = [];
+  if(notaParam) notasSinMapear.push(notaParam);
+
+  if(areaParam){
+    const selArea = document.getElementById('f_Area');
+    const coincidencia = buscarOpcion(selArea, areaParam);
+    if(coincidencia){
+      selArea.value = coincidencia;
+    } else {
+      selArea.value = 'Otro';
+      notasSinMapear.push('Área / servicio de origen: ' + areaParam);
+    }
+  }
+
+  if(pacienteParam){
+    document.getElementById('f_PacienteRef').value = pacienteParam;
+  }
+
+  if(fechaParam && /^\d{4}-\d{2}-\d{2}$/.test(fechaParam)){
+    document.getElementById('f_FechaEvento').value = fechaParam;
+  }
+
+  if(turnoParam){
+    const selTurno = document.getElementById('f_Turno');
+    const coincidenciaTurno = buscarOpcion(selTurno, turnoParam);
+    if(coincidenciaTurno) selTurno.value = coincidenciaTurno;
+  }
+
+  if(medicoParam){
+    document.getElementById('f_MedicoTratante').value = medicoParam;
+  }
+
+  if(notasSinMapear.length){
+    const campoDesc = document.getElementById('f_Descripcion');
+    campoDesc.value = '(' + notasSinMapear.join(' · ') + ')\n' + campoDesc.value;
+  }
+
+  const nombreOrigen = ORIGENES[origenParam.toLowerCase()] || 'otra aplicación';
+  const aviso = document.getElementById('avisoPrecarga');
+  aviso.style.display = 'block';
+  aviso.innerHTML = '📥 Se precargaron datos desde <b>' + nombreOrigen + '</b>. Verifica la información antes de completar y guardar el evento.';
+}
+
+precargarDesdeURL();
 </script>
 </body>
 </html>
